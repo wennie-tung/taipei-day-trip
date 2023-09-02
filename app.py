@@ -3,9 +3,6 @@ app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-# Session 金鑰匙
-app.secret_key = "SecrectKey202308"
-
 # MySQL
 import mysql.connector
 
@@ -38,26 +35,41 @@ def getAttraction():
 	page = int(request.args.get("page", 0))
 	keyword = request.args.get("keyword", None)
 	per_page = 12
-	offset = (page - 1) * per_page
-	if page == 0:
-		sql = 'SELECT * FROM attraction WHERE mrt = %s OR name LIKE %s'
-		val = ( keyword,'%' + keyword + '%',)
-	else:
-		sql = 'SELECT * FROM attraction LIMIT %s, %s'
-		val = (offset, per_page)
+	offset = page * per_page
+
+	# SQL 查询
+	sql = 'SELECT * FROM attraction'
+	where_filter = ''
+	val = ()
+
+	if keyword:
+		where_filter = 'WHERE (mrt = %s OR name LIKE %s)'
+		keyword_pattern = f'%{keyword}%'
+		val = (keyword, keyword_pattern)
+
+	# 完整指令
+	sql += ' ' + where_filter + ' LIMIT %s OFFSET %s'
+	val += (per_page, offset)
+
 	mycursor = mydb.cursor(dictionary=True)
 	mycursor.execute(sql, val)
 	searchResult = mycursor.fetchall()
+	# print(searchResult)
+	print(len(searchResult))
 
 	for result in searchResult:
 		result['images'] = json.loads(result['images'])
 
-	myResult = {"nextPage": page+1, "data": searchResult}
+	# 如果有下一頁，回傳 nextPage = page+1，否則為 null
+	has_nextPage = (len(searchResult) >= per_page)
+	has_result = (len(searchResult) > 0)
 
-	if searchResult:
-		response_data = myResult
+	if has_nextPage and has_result:
+		response_data = {"nextPage":page+1, "data":searchResult}
+	elif not has_nextPage and has_result:
+		response_data = {"nextPage":None, "data":searchResult}
 	else:
-		response_data = {"data": None}
+		response_data = {"nextPage":None, "data":None}
 	return jsonify(response_data)
 
 
@@ -95,7 +107,9 @@ def getMrt():
 		sql = 'SELECT mrt_counts.mrt FROM (SELECT mrt, COUNT(*) AS mrt_count FROM attraction WHERE mrt IS NOT NULL GROUP BY mrt) AS mrt_counts ORDER BY mrt_counts.mrt_count DESC'
 		mycursor.execute(sql)
 		searchResult = mycursor.fetchall()
-		return searchResult
+		# 把查詢結果撈出裝在 list 內
+		mrt_list = [result[0] for result in searchResult]
+		return jsonify({"data": mrt_list})
 	except Exception as e:
 		return jsonify({"error": True, "message": "伺服器內部錯誤"}), 500
 
