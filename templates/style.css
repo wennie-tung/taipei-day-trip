@@ -1,0 +1,191 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    }
+
+/* navigation */
+.navigationFrame{
+    display: flex;
+    justify-content: center;
+}
+
+.navigationBar{
+    width: 1200px;
+    height: 54px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px auto;
+    /* position: fixed;
+    top: 10px;
+    left: 120px; */
+    /* 這邊 fixed 屬性要再調整 */
+}
+
+.title{
+    color: #448899;
+    font-size: 30px;
+    font-weight: bold;
+    /* font-family: */
+    line-height: 34px;
+}
+
+.list{
+    color: #666666;
+    font-size: 16px;
+    line-height: 13.3px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.list * {
+    color: #666666;
+    padding: 10px;
+}
+
+/* hero section */
+.heroSection{
+    display: flex;
+    flex-direction: column;
+    width: 100vw; /* 100% of the viewport width */
+    height: 320px;
+    background-image: url(../public/welcome.png);
+    background-size: cover;
+}
+
+.heroSection img{
+    height: 480px;
+}
+
+.slogan{
+    width: 1200px;
+    height: 169px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 10px;
+    margin: auto auto;
+}
+
+.sloganText1{
+    color: #f8f8f8;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.sloganText2{
+    color: #f8f8f8;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.searchBar{
+    width: 460px;
+    height: 46px;
+    box-sizing: border-box;
+    margin: 10px 0;
+    display: flex;
+}
+
+.searchBar input{
+    background-color: #ffffff;
+    width: 400px;
+    padding: 0;
+    border: none;
+    border-radius: 5px 0px 0px 5px;
+}
+
+.searchBar :placeholder-shown{
+    color: #757575;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 15px;
+}
+
+.searchButton{
+    background-image: url(../public/searchIcon.png);
+    background-position: center;
+    background-size: cover;
+    width: 60px;
+    height: 46px;
+    border: none;
+    border-radius: 0px 5px 5px 0px;
+    cursor: pointer;
+}
+
+/* main */
+/* lsit bar */
+.listBar{
+    width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 40px auto 20px auto;
+}
+
+.arrow{
+    background-size: cover;
+    width: 32px;
+    height: 32px;
+    border: none;
+    cursor: pointer;
+    background-color: #ffffff;
+}
+
+/* attractions */
+.attractions{
+    width: 1170px;
+    height: 786px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 15px;
+    margin: 0px auto;
+}
+
+.attraction{
+    width: 270px;
+    height: 242px;
+    box-sizing: border-box;
+    border: 1px solid;
+    border-radius: 5px;
+    border-color: #e8e8e8;
+}
+
+.attraction img{
+    width: 268px;
+    height: 197px;
+    box-sizing: border-box;
+    object-fit: cover;
+    vertical-align: bottom;
+}
+
+.info{
+    width: 250px;
+    height: 25px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    padding: 10px;
+}
+
+.name{
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #000000;
+    opacity: 0.6;
+    width: 268px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    position: relative;
+    top: -85px;
+    box-sizing: border-box;
+}
