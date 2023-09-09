@@ -14,6 +14,7 @@
 </head>
 
 <body>
+
     <!-- navigation -->
     <div class="navigationFrame">
         <div class="navigationBar">
@@ -64,8 +65,8 @@
         <div class="footerText">COPYRIGHT © 2021 台北一日遊</div>
     </footer>
 
-
 </body>
+
 <script>
 
     const PROD_API_PATH = "http://13.238.60.107:3000";
@@ -89,14 +90,14 @@
     // fetch 取得捷運站 API 資料 
     // 使用 async, await 處理異步程式碼
     async function getMrtsData() {
-        const response = await fetch(`${DEV_API_PATH}/api/mrts`);
+        const response = await fetch(`${PROD_API_PATH}/api/mrts`);
         const data = await response.json();
         return data.data;
     }
 
-    // fetch 取得捷運站 API 資料 
+    // fetch 取得 attractions API 資料 
     async function getAttractionsData(page, keyword) {
-        const response = await fetch(`${DEV_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
+        const response = await fetch(`${PROD_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
         const data = await response.json();
         // 先把 API 回傳的 nextPage 存起來
         nextPage = data.nextPage;
@@ -111,14 +112,21 @@
             const mrtElement = document.createElement('div');
             mrtElement.classList.add('mrt');
             mrtElement.innerText = mrt;
+            // render 到點擊後的搜尋頁面
             mrtElement.addEventListener('click', async function () {
                 const searchInput = document.getElementById('searchInput');
                 searchInput.value = mrt;
                 const attractions = await getAttractionsData(0, mrt);
-                const attractionsContainer = document.querySelector('.attractions');
-                // 先把原本的清掉
-                attractionsContainer.innerHTML = '';
-                renderAttractions(attractions);
+                let mrtAttractions = [];
+                attractions.forEach((attraction) => {
+                    if (mrt === attraction.mrt){
+                        const attractionsContainer = document.querySelector('.attractions');
+                        mrtAttractions.push(attraction);
+                        // 先把原本的清掉
+                        attractionsContainer.innerHTML = '';
+                        renderAttractions(mrtAttractions);
+                    };
+                });
             });
             mrtsContainer.appendChild(mrtElement);
         });
@@ -176,7 +184,7 @@
     });
 
     // // scroll 載入更多
-    const setDelayTime = 2000;
+    const setDelayTime = 1000;
     // 監聽 scroll 事件
     window.addEventListener('scroll', setDelay(async function () {
         if (isNearBottom()) {
@@ -231,7 +239,7 @@
             loadingOverLay.style.display = "none";
         }
     };
-    
+
 </script>
 
 </html>

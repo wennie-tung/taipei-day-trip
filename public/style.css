@@ -4,6 +4,10 @@ body{
     font-family: 'Noto Sans TC';
     }
 
+button{
+    padding: 0;
+}
+
 /* navigation */
 .navigationFrame{
     background-color: #ffffff;
@@ -11,12 +15,13 @@ body{
     justify-content: center;
     position: fixed;
     top: 0;
-    width: 100vw;
+    width: 100%;
     z-index: 1000;
 }
 
 .navigationBar{
-    width: 1200px;
+    width: 100%;
+    max-width: 1200px;
     height: 34px;
     text-align: center;
     display: flex;
@@ -53,7 +58,8 @@ body{
     height: 320px;
     background-image: url(/welcome.png);
     margin-top: 54px;
-    /* background-size: cover; */
+    background-size: cover;
+    overflow: hidden
 }
 
 .heroSection img{
@@ -61,13 +67,15 @@ body{
 }
 
 .slogan{
-    width: 1200px;
+    width: 100%;
+    max-width: 1200px;
     height: 149px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 10px;
     margin: auto auto;
+    box-sizing: border-box;
 }
 
 .sloganText1{
@@ -119,11 +127,13 @@ body{
 /* main */
 /* lsit bar */
 .listBar{
-    width: 1200px;
+    width: 100%;
+    max-width: 1200px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 40px auto 20px auto;
+    padding: 0px 15px;
     box-sizing: border-box;
 }
 
@@ -133,7 +143,7 @@ body{
     align-items: center;
     overflow-x: hidden;
     white-space: nowrap;
-    padding: 5px 15px;
+    padding: 5px 0px;
     font-size: 16px;
     color: #666666;
     cursor: pointer;
@@ -153,7 +163,6 @@ body{
     border: none;
     cursor: pointer;
     background-color: #ffffff;
-    padding-left: 15px;
 }
 
 .arrowRight{
@@ -163,12 +172,12 @@ body{
     border: none;
     cursor: pointer;
     background-color: #ffffff;
-    padding-right: 15px;
 }
 
 /* attractions */
 .attractions{
-    width: 1170px;
+    width: 100%;
+    max-width: 1200px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
@@ -233,7 +242,7 @@ body{
 
 footer{
     background-color: #757575;
-    width: 100vw;
+    width: 100%;
     height: 104px;
     display: flex;
     justify-content: center;
@@ -276,9 +285,10 @@ footer{
   }
 
 /* RWD */
-/* 螢幕寬度介於 360 - 600 像素之間 */
-@media screen and (min-width:360px) and (max-width:600px) {
+/* 螢幕寬度介於 360 - 1200 像素之間 */
+@media screen and (min-width:360px) and (max-width:1200px) {
     .navigationBar{
+        width: auto;
         margin: 10px 0px 10px 10px;
     }
     
@@ -295,7 +305,7 @@ footer{
     }
 
     .slogan{
-        margin: auto 10px;
+        width: 360px;
     }
 
     .listBar{
