@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wennie Tung">
+    <title>Taipei Trip 台北一日遊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <!-- navigation -->
+    <div class="navigationFrame">
+        <div class="navigationBar">
+            <div class="title">台北一日遊</div>
+            <div class="list">
+                <div>預定行程</div>
+                <div>登入/註冊</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- hero section -->
+    <div class="heroSection">
+        <div class="slogan">
+            <div class="sloganText1">輕鬆享受台北一日悠閒</div>
+            <div class="sloganText2">探索每個角落，體驗城市的深度旅遊行程</div>
+            <div class="searchBar">
+                <input id="searchInput" type="text" placeholder="輸入景點名稱查詢">
+                <button class="searchButton"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- main -->
+    <!-- list bar -->
+    <div class="listBar">
+        <button id="arrowLeft" class="arrowLeft"><img src="/arrowLeft.png" alt="arrowLeft"></button>
+        <div id="mrts"></div>
+        <button id="arrowRight" class="arrowRight"><img src="/arrowRight.png" alt="arrowRight"></button>
+    </div>
+    <!-- attractions -->
+    <div class="attractions"></div>
+    <!-- <div class="attraction">
+            <img src="/logan1.jpg">
+            <div class="info">
+                <span class="mrtInfo">忠孝復興</span>
+                <span class="categoryInfo">公共藝術</span>
+            </div>
+            <div class="name">平安鐘</div>
+        </div> -->
+
+    <div id="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <div class="footerText">COPYRIGHT © 2021 台北一日遊</div>
+    </footer>
+
+</body>
+
+<script>
+
+    const PROD_API_PATH = "http://13.238.60.107:3000";
+    const DEV_API_PATH = "http://127.0.0.1:3000";
+    let nextPage = 0;
+
+    // 一進入頁面就要載入資料
+    // 使用 async, await 處理異步程式碼
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            const mrts = await getMrtsData();
+            renderMrts(mrts);
+            const attractions = await getAttractionsData(0, '');
+            renderAttractions(attractions);
+
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    });
+
+    // fetch 取得捷運站 API 資料 
+    // 使用 async, await 處理異步程式碼
+    async function getMrtsData() {
+        const response = await fetch(`${PROD_API_PATH}/api/mrts`);
+        const data = await response.json();
+        return data.data;
+    }
+
+    // fetch 取得 attractions API 資料 
+    async function getAttractionsData(page, keyword) {
+        const response = await fetch(`${PROD_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
+        const data = await response.json();
+        // 先把 API 回傳的 nextPage 存起來
+        nextPage = data.nextPage;
+        return data.data;
+    }
+
+    // 把 mrt render 到頁面上
+    // 也把點擊到的 mrt 結果 render 到頁面上
+    function renderMrts(mrts) {
+        const mrtsContainer = document.getElementById('mrts');
+        mrts.forEach((mrt) => {
+            const mrtElement = document.createElement('div');
+            mrtElement.classList.add('mrt');
+            mrtElement.innerText = mrt;
+            // render 到點擊後的搜尋頁面
+            mrtElement.addEventListener('click', async function () {
+                const searchInput = document.getElementById('searchInput');
+                searchInput.value = mrt;
+                const attractions = await getAttractionsData(0, mrt);
+                let mrtAttractions = [];
+                attractions.forEach((attraction) => {
+                    if (mrt === attraction.mrt){
+                        const attractionsContainer = document.querySelector('.attractions');
+                        mrtAttractions.push(attraction);
+                        // 先把原本的清掉
+                        attractionsContainer.innerHTML = '';
+                        renderAttractions(mrtAttractions);
+                    };
+                });
+            });
+            mrtsContainer.appendChild(mrtElement);
+        });
+    }
+
+    // 把 attractions render 到頁面上
+    function renderAttractions(attractions) {
+        const attractionsContainer = document.querySelector('.attractions');
+        // 如果沒有相關結果，查詢到 null
+        if (attractions === null) {
+            const noResult = document.createElement('div');
+            noResult.classList.add('noResult');
+            noResult.innerText = "查無結果";
+            attractionsContainer.appendChild(noResult);
+            return;
+        }
+        // 如果有結果，執行以下
+        attractions.forEach((attraction) => {
+            const attractionElement = document.createElement('div');
+            attractionElement.classList.add('attraction');
+            attractionElement.innerHTML = `
+                    <img src="${attraction.images[0]}">
+                    <div class="info">
+                        <span class="mrtInfo">${attraction.mrt}</span>
+                        <span class="categoryInfo">${attraction.category}</span>
+                    </div>
+                    <div class="name">${attraction.name}</div>`;
+            attractionsContainer.appendChild(attractionElement);
+        });
+    };
+
+    // 把 seaarchBar 搜尋結果 render 到頁面上
+    const searchButton = document.querySelector('.searchButton');
+    let keyword = '';
+
+    searchButton.addEventListener('click', async () => {
+        event.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        keyword = searchInput.value;
+        const attractions = await getAttractionsData(0, keyword);
+        const attractionsContainer = document.querySelector('.attractions');
+        attractionsContainer.innerHTML = '';
+        renderAttractions(attractions);
+    });
+
+    // mrts 列表 滾動設計
+    const mrtsContainer = document.getElementById('mrts');
+    const scrollDistance = 205; // 設定每次滾動的距離
+
+    document.querySelector('#arrowLeft').addEventListener('click', () => {
+        mrtsContainer.scrollLeft -= scrollDistance;
+    });
+    document.querySelector('#arrowRight').addEventListener('click', () => {
+        mrtsContainer.scrollLeft += scrollDistance
+    });
+
+    // // scroll 載入更多
+    const setDelayTime = 1000;
+    // 監聽 scroll 事件
+    window.addEventListener('scroll', setDelay(async function () {
+        if (isNearBottom()) {
+            // 避免重複觸發
+            // 呼叫 API
+            if (nextPage !== null) {
+                showLoading();
+                const attractions = await getAttractionsData(nextPage, keyword);
+                renderAttractions(attractions);
+                setTimeout(function () {
+                    hideLoading();
+                }, setDelayTime);
+            }
+        }
+    }, setDelayTime));
+
+    // 檢查是否接近頁面底部
+    function isNearBottom() {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        // 在底部 100px 觸發
+        return scrollY + windowHeight >= documentHeight - 100;
+    }
+
+    // 控制處理捲動事件的函數，避免被頻繁觸發
+    function setDelay(callback, wait) {
+        let timeout;
+        return function () {
+            const context = this;
+            const args = arguments;
+            if (!timeout) {
+                timeout = setTimeout(function () {
+                    callback.apply(context, args)
+                    timeout = null;  // 重置 timeout
+                }, wait)
+            }
+        }
+    };
+
+    // 控制 loading 畫面出現與否
+    const loadingOverLay = document.getElementById('loading-overlay')
+    // 顯示 loading 遮罩
+    function showLoading() {
+        if (loadingOverLay) {
+            loadingOverLay.style.display = "flex"; 
+        }
+    };
+    // 隱藏 loading 遮罩
+    function hideLoading(){
+        if (loadingOverLay){
+            loadingOverLay.style.display = "none";
+        }
+    };
+
+</script>
+
+</html>
