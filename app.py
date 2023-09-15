@@ -9,7 +9,7 @@ import mysql.connector
 # 連接到本機的 MySQL
 mydb = mysql.connector.connect(
     host="localhost",
-    user="wennie",
+    user="root",
     password="password",
     database="websiteTT"
 )
@@ -54,8 +54,6 @@ def getAttraction():
 	mycursor = mydb.cursor(dictionary=True)
 	mycursor.execute(sql, val)
 	searchResult = mycursor.fetchall()
-	# print(searchResult)
-	# print(len(searchResult))
 
 	for result in searchResult:
 		result['images'] = json.loads(result['images'])
