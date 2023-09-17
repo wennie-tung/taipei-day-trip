@@ -89,22 +89,18 @@
     // fetch 取得捷運站 API 資料 
     // 使用 async, await 處理異步程式碼
     async function getMrtsData() {
-        const response = await fetch(`${DEV_API_PATH}/api/mrts`);
+        const response = await fetch(`${PROD_API_PATH}/api/mrts`);
         const data = await response.json();
         return data.data;
     };
 
     // fetch 取得 attractions API 資料 
     async function getAttractionsData(page, keyword) {
-        const response = await fetch(`${DEV_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
+        const response = await fetch(`${PROD_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
         const data = await response.json();
         const dataData = data.data;
         // 先把 API 回傳的 nextPage 存起來
         nextPage = data.nextPage;
-        // 把 id 存起來
-        dataData.forEach((attractionData) => {
-            id = attractionData.id;
-        });
         return data.data;
     };
 
@@ -149,9 +145,10 @@
         }
         // 如果有結果，執行以下
         attractions.forEach((attraction) => {
+            const attractionLink = document.createElement('a')
+            attractionLink.href = `/attraction/${attraction.id}`
             const attractionElement = document.createElement('div');
             attractionElement.classList.add('attraction');
-            console.log('images :' + attraction.images.length)
             attractionElement.innerHTML = `
                     <img src="${attraction.images[0]}">
                     <div class="info">
@@ -159,7 +156,8 @@
                         <span class="categoryInfo">${attraction.category}</span>
                     </div>
                     <div class="name">${attraction.name}</div>`;
-            attractionsContainer.appendChild(attractionElement);
+            attractionLink.appendChild(attractionElement);
+            attractionsContainer.appendChild(attractionLink);
         });
     };
 
@@ -228,7 +226,7 @@
                 }, wait)
             }
         }
-    };
+    }
 
     // 控制 loading 畫面出現與否
     const loadingOverLay = document.getElementById('loading-overlay')
@@ -237,13 +235,13 @@
         if (loadingOverLay) {
             loadingOverLay.style.display = "flex"; 
         }
-    };
+    }
     // 隱藏 loading 遮罩
     function hideLoading(){
         if (loadingOverLay){
             loadingOverLay.style.display = "none";
         }
-    };
+    }
 
 </script>
 

@@ -10,14 +10,17 @@ button{
 
 hr{
     border: 0.8px solid #e8e8e8;
-    width: 1200px;
+    width: 100%;
+    margin: 40px 0;
 }
 
+a {
+    text-decoration: none; 
+    color: inherit; 
+    background-color: transparent; 
+  }  
+
 /* navigation */
-.navigationContainer{
-    width: 100%;
-    height: 55px;
-}
 
 .navigationFrame{
     border-bottom: 1px solid #e8e8e8;
@@ -29,6 +32,7 @@ hr{
     left: 0;
     width: 100%;
     z-index: 1000;
+    box-sizing: border-box;
 }
 
 .navigationBar{
@@ -39,7 +43,7 @@ hr{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 10px auto;
+    margin: 10px;
 }
 
 .header{
@@ -65,7 +69,7 @@ hr{
 /* 1200px container */
 .container{
     max-width: 1200px;
-    margin: 0px auto;
+    margin: 91px auto;
 }
 
 /* hero section */
@@ -303,9 +307,8 @@ footer{
   }
 
 .sectionFrame{
-    display: flex;
-    justify-content: center;
     margin: 40px 0px;
+    padding-bottom: 10px;
 }
 
 .section{
@@ -326,6 +329,13 @@ footer{
     margin-right: 15px;
     box-sizing: border-box;
     position: relative;
+}
+
+.imagesContainer{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
 }
 
 .picture{
@@ -408,6 +418,7 @@ footer{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-sizing: border-box;
 }
 
 .title{
@@ -457,7 +468,7 @@ footer{
     cursor: pointer;
 }
 
-.bookingTime{
+.bookingDate{
     max-width: 193px;
     max-height: 35px;
     background-color: #ffffff;
@@ -474,15 +485,8 @@ footer{
     border-radius: 10px;
 }
 
-.morningFee{
+.showFee{
     display: inline;
-    font-size: 16px;
-    font-weight: 500;
-    color: #666666;
-}
-
-.afternoonFee{
-    display: none;
     font-size: 16px;
     font-weight: 500;
     color: #666666;
@@ -517,13 +521,81 @@ footer{
 
 
 /* RWD */
-/* 螢幕寬度介於 360 - 480 像素之間 */
-@media screen and (min-width:360px) and (max-width:480px) {
-    .navigationBar{
-        width: auto;
-        margin: 10px 0px 10px 10px;
+/* 螢幕寬度介於 700 - 1200 像素之間 */
+@media screen and (min-width:700px) and (max-width:1200px){
+    /* index */
+    .attractions{
+        width: fit-content;
+        grid-template-columns: repeat(2, 1fr);
+        margin: 20px auto
     }
-    
+
+    .attraction{
+        margin: 10px;
+        box-sizing: border-box;
+        border: 1px solid;
+        border-radius: 5px;
+        border-color: #e8e8e8;
+        height: 295px;
+        width: auto;
+    }
+
+    .attraction img{
+        width: 100%;
+        height: 250px;
+        box-sizing: border-box;
+        object-fit: cover;
+        vertical-align: bottom;
+    }
+
+    .info{
+        width: auto;
+        height: auto;
+    }
+
+    .name{
+        width: auto;
+        height: auto;
+    }
+
+
+    /* attraction page */
+    .section{
+        flex-direction: column;
+        height: auto;
+    } 
+
+    .pictureSlideshow{
+        width: 100%;
+        margin: 0;
+    }
+
+    .profile{
+        width: 100%;
+        height: 390px;
+        margin: 20px 0 0 0;
+    }
+
+    .discription{
+        padding: 15px;
+    }
+
+    .title, .infromation{
+        padding-left: 10px;
+    }
+
+    .bookingForm{
+        padding-left: 15px;
+    }
+
+}
+
+/* 螢幕寬度介於 360 - 700 像素之間 */
+@media screen and (min-width:360px) and (max-width:700px) {
+    hr{
+        margin: 35px 0;
+    }
+
     .searchBar{
         width: 285px;
     }
@@ -587,4 +659,46 @@ footer{
         margin-top: 20px;
     }
 
+    .container{
+        margin: 55px auto;
+    }
+
+    .sectionFrame{
+        margin: 0;
+    }
+
+    .section{
+        flex-direction: column;
+        height: auto;
+        padding: 0;
+    } 
+
+    .pictureSlideshow{
+        width: 100%;
+        height: 350px;
+        margin: 0;
+    }
+
+    .profile{
+        width: 95%;
+        height: 390px;
+        margin-top: 20px;
+        margin-left: 0;
+    }
+
+    .title, .infromation{
+        padding-left: 10px;
+    }
+
+    .bookingForm{
+        padding-left: 20px;
+        margin-left: 10px;
+    }
+
+    .bookingButton{
+        height: 45px;
+        font-size: 19px;
+        font-weight: 400;
+    }
+    
 }
