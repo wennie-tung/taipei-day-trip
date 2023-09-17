@@ -54,8 +54,6 @@ def getAttraction():
 	mycursor = mydb.cursor(dictionary=True)
 	mycursor.execute(sql, val)
 	searchResult = mycursor.fetchall()
-	# print(searchResult)
-	# print(len(searchResult))
 
 	for result in searchResult:
 		result['images'] = json.loads(result['images'])

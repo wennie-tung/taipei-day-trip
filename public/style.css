@@ -8,15 +8,32 @@ button{
     padding: 0;
 }
 
+hr{
+    border: 0;
+    border-bottom: 1px solid #e8e8e8;
+    width: 100%;
+    margin: 40px 0;
+}
+
+a {
+    text-decoration: none; 
+    color: inherit; 
+    background-color: transparent; 
+  }  
+
 /* navigation */
+
 .navigationFrame{
+    border-bottom: 1px solid #e8e8e8;
     background-color: #ffffff;
     display: flex;
     justify-content: center;
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     z-index: 1000;
+    box-sizing: border-box;
 }
 
 .navigationBar{
@@ -27,10 +44,10 @@ button{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 10px auto;
+    margin: 10px;
 }
 
-.title{
+.header{
     color: #448899;
     font-size: 30px;
     font-weight: 700;
@@ -48,6 +65,12 @@ button{
 .list * {
     color: #666666;
     padding: 10px;
+}
+
+/* 1200px container */
+.container{
+    max-width: 1200px;
+    margin: 91px auto;
 }
 
 /* hero section */
@@ -284,14 +307,339 @@ footer{
     100% { transform: rotate(360deg); }
   }
 
-/* RWD */
-/* 螢幕寬度介於 360 - 1200 像素之間 */
-@media screen and (min-width:360px) and (max-width:1200px) {
-    .navigationBar{
-        width: auto;
-        margin: 10px 0px 10px 10px;
+.sectionFrame{
+    margin: 40px 0px;
+    padding-bottom: 10px;
+}
+
+.section{
+    width: 100%;
+    max-width: 1200px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    padding: 0px 15px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* slide show */
+.pictureSlideshow{
+    width: 50%;
+    height: 100%;
+    margin-right: 15px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.imagesContainer{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.picture{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: none;
+}
+
+.picture img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.prev{
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    top: 50%;
+    left: 2%;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.next {
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    top: 50%;
+    right: 2%;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.prev:hover, .next:hover{
+    opacity: 1;
+}
+
+.dotFrame{
+    width: 100%;
+    position: absolute;
+    bottom: 2%;
+    display: flex;
+    justify-content: center;
+}
+
+.dot{
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid #ffffff;
+    margin: 0px 6px;
+    background-color: #ffffff;
+    opacity: 0.6;
+}
+
+.active, .dot:hover{
+    background-color: #000000;
+}
+
+.fade{
+    animation-name: fade;
+    animation-duration: 1.3s;
+}
+
+@keyframes fade{
+    from {
+        opacity: 0.4;
     }
-    
+    to {
+        opacity: 1;
+    }
+}
+
+.profile{
+    width: 50%;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.title{
+    font-size: 24px;
+    color: #666666;
+    font-weight: bold;
+}
+
+.infromation{
+    font-size: 16px;
+    font-weight: 500;
+    color: #666666;
+}
+
+/* bookingForm */
+.bookingForm{
+    width: 100%;
+    height: 302px;
+    background-color: #e8e8e8;
+    box-sizing: border-box;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.bookingOption{
+    font-size: 16px;
+    font-weight: 700;
+    color: #666666;
+}
+
+.bookingText{
+    font-size: 16px;
+    font-weight: 500;
+    color: #666666;
+}
+
+.bookingButton{
+    font-size: 19px;
+    width: 154px;
+    height: 40px;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 5px;
+    background-color: #448899;
+    color: #ffffff;
+    text-align: center;
+    cursor: pointer;
+    /* padding: 10px 0px; */
+}
+
+.bookingDate{
+    max-width: 193px;
+    max-height: 35px;
+    background-color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+}
+
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    margin-left: 20px;
+}
+
+.morning{
+    border: 10px solid #ffffff;
+    border-radius: 10px;
+}
+
+.afternoon{
+    border: 10px solid #ffffff;
+    border-radius: 10px;
+}
+
+.showFee{
+    display: inline;
+    font-size: 16px;
+    font-weight: 500;
+    color: #666666;
+}
+
+.discriptionFrame{
+    display: flex;
+    justify-content: center;
+}
+
+.discription{
+    width: 1200px;
+    min-height: 362px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.text{
+    font-size: 16px;
+    color: #666666;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.infos{
+    font-size: 16px;
+    color: #666666;
+    font-weight: bold;
+}
+
+/* radio botton */
+.radio-container {
+    position: relative;
+    padding-left: 30px; 
+    padding-right: 13px;
+}
+
+
+
+/* 隱藏預設 radio button 樣式 */
+.radio-container input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+/* radio button 外觀 */
+.radio-container .custom-radio {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 22px; 
+    height: 22px;
+    background-color: #ffffff; 
+    border: 2px solid #ffffff; 
+    border-radius: 50%; 
+}
+
+/* checked */
+.radio-container input[type="radio"]:checked + .custom-radio {
+    background-color: #448899; /* 選擇時的背景色 */
+}
+
+
+
+/* RWD */
+/* 螢幕寬度介於 700 - 1200 像素之間 */
+@media screen and (min-width:700px) and (max-width:1200px){
+    /* index */
+    .attractions{
+        width: fit-content;
+        grid-template-columns: repeat(2, 1fr);
+        margin: 20px auto
+    }
+
+    .attraction{
+        margin: 10px;
+        box-sizing: border-box;
+        border: 1px solid;
+        border-radius: 5px;
+        border-color: #e8e8e8;
+        height: 295px;
+        width: auto;
+    }
+
+    .attraction img{
+        width: 100%;
+        height: 250px;
+        box-sizing: border-box;
+        object-fit: cover;
+        vertical-align: bottom;
+    }
+
+    .info{
+        width: auto;
+        height: auto;
+    }
+
+    .name{
+        width: auto;
+        height: auto;
+    }
+
+
+    /* attraction page */
+    .section{
+        flex-direction: column;
+        height: auto;
+    } 
+
+    .pictureSlideshow{
+        width: 100%;
+        margin: 0;
+    }
+
+    .profile{
+        width: 100%;
+        height: 390px;
+        margin: 20px 0 0 0;
+    }
+
+    .discription{
+        padding: 15px;
+    }
+
+    .title, .infromation{
+        padding-left: 10px;
+    }
+
+    .bookingForm{
+        padding-left: 15px;
+    }
+
+}
+
+/* 螢幕寬度介於 360 - 700 像素之間 */
+@media screen and (min-width:360px) and (max-width:700px) {
+    hr{
+        margin: 35px 0;
+    }
+
     .searchBar{
         width: 285px;
     }
@@ -355,4 +703,46 @@ footer{
         margin-top: 20px;
     }
 
+    .container{
+        margin: 55px auto;
+    }
+
+    .sectionFrame{
+        margin: 0;
+    }
+
+    .section{
+        flex-direction: column;
+        height: auto;
+        padding: 0;
+    } 
+
+    .pictureSlideshow{
+        width: 100%;
+        height: 350px;
+        margin: 0;
+    }
+
+    .profile{
+        width: 95%;
+        height: 390px;
+        margin-top: 20px;
+        margin-left: 0;
+    }
+
+    .title, .infromation{
+        padding-left: 10px;
+    }
+
+    .bookingForm{
+        padding-left: 20px;
+        margin-left: 10px;
+    }
+
+    .bookingButton{
+        height: 45px;
+        font-size: 19px;
+        font-weight: 400;
+    }
+    
 }
