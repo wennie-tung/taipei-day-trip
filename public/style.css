@@ -9,7 +9,8 @@ button{
 }
 
 hr{
-    border: 1px solid #e8e8e8;
+    border: 0;
+    border-bottom: 1px solid #e8e8e8;
     width: 100%;
     margin: 40px 0;
 }
