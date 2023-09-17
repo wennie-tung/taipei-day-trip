@@ -15,17 +15,15 @@
 
 <body>
 <!-- navigation -->
-<!-- <div class="navigationContainer"> -->
-    <div class="navigationFrame">
-        <div class="navigationBar">
-            <div class="header">台北一日遊</div>
-            <div class="list">
-                <div>預定行程</div>
-                <div>登入/註冊</div>
-            </div>
+<div class="navigationFrame">
+    <div class="navigationBar">
+        <div class="header">台北一日遊</div>
+        <div class="list">
+            <div>預定行程</div>
+            <div>登入/註冊</div>
         </div>
     </div>
-<!-- </div> -->
+</div>
 
 <!-- 1200px -->
 <div class="container">
@@ -56,12 +54,19 @@
                     </div>
                     <div class="bookingOption">選擇時間：
                         <!-- checked 預設勾選上半天 -->
-                        <input type="radio" name="bookingTime" value="2000" checked id="morning"/><label for="huey">上半天</label>
-                        <input type="radio" name="bookingTime" value="2500" id="afternoon"/><label for="huey">下半天</label>
+                        <label class="radio-container">
+                            <input type="radio" name="bookingTime" value="2000" checked id="morning">
+                            <span class="custom-radio"></span>
+                            上半天
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="bookingTime" value="2500" id="afternoon">
+                            <span class="custom-radio"></span>
+                            下半天
+                        </label>
                     </div>
                     <div class="bookingOption">導覽費用：
                         <span class="showFee">新台幣 2000 元</span>
-                        <!-- <span class="afternoonFee">新台幣 2500 元</span> -->
                     </div>
                     <button class="bookingButton">開始預約行程</button>
                 </div>

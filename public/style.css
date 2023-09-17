@@ -9,7 +9,7 @@ button{
 }
 
 hr{
-    border: 0.8px solid #e8e8e8;
+    border: 1px solid #e8e8e8;
     width: 100%;
     margin: 40px 0;
 }
@@ -458,14 +458,17 @@ footer{
 }
 
 .bookingButton{
+    font-size: 19px;
     width: 154px;
-    height: 36px;
+    height: 40px;
+    box-sizing: border-box;
     border: none;
     border-radius: 5px;
     background-color: #448899;
     color: #ffffff;
     text-align: center;
     cursor: pointer;
+    /* padding: 10px 0px; */
 }
 
 .bookingDate{
@@ -473,6 +476,13 @@ footer{
     max-height: 35px;
     background-color: #ffffff;
     border: none;
+    padding: 5px 10px;
+}
+
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    margin-left: 20px;
 }
 
 .morning{
@@ -518,6 +528,39 @@ footer{
     color: #666666;
     font-weight: bold;
 }
+
+/* radio botton */
+.radio-container {
+    position: relative;
+    padding-left: 30px; 
+    padding-right: 13px;
+}
+
+
+
+/* 隱藏預設 radio button 樣式 */
+.radio-container input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+/* radio button 外觀 */
+.radio-container .custom-radio {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 22px; 
+    height: 22px;
+    background-color: #ffffff; 
+    border: 2px solid #ffffff; 
+    border-radius: 50%; 
+}
+
+/* checked */
+.radio-container input[type="radio"]:checked + .custom-radio {
+    background-color: #448899; /* 選擇時的背景色 */
+}
+
 
 
 /* RWD */
