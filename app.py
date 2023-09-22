@@ -115,76 +115,99 @@ def getMrt():
 		return jsonify({"error": True, "message": "伺服器內部錯誤"}), 500
 
 # 註冊 API
-@app.route("/api/signup", methods=['POST'])
+@app.route("/api/user", methods=['POST'])
 def signUp():
 	name = request.json.get('name')
-	account = request.json.get('account')
+	account = request.json.get('email')
 	password = request.json.get('password')
 	sql = 'SELECT * FROM member WHERE account = %s'
 	mycursor.execute(sql, (account,))
 	existing_account = mycursor.fetchall()
 
-	if existing_account:
-		data = {'message': '註冊失敗，請再試一次'}
-		return jsonify(data), 401
-	else:
-		sql = 'INSERT INTO member(name, account, password) VALUES(%s, %s, %s)'
-		val = (name, account, password)
-		mycursor.execute(sql, val)
-		mydb.commit()
-		data = {'message': '註冊成功，請重新登入'}
-		return jsonify(data)
+	try:
+		if existing_account:
+			data = {
+				'error' : True,
+				'message': '此 email 已存在，請用其他 email 註冊'
+				}
+			return jsonify(data), 400
+		else:
+			sql = 'INSERT INTO member(name, account, password) VALUES(%s, %s, %s)'
+			val = (name, account, password)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			data = {'ok': 'true'}
+			return jsonify(data)
+		
+	except Exception as e:
+		data = {
+			'error' : True,
+			'message': '伺服器內部錯誤'
+		}
+		return jsonify(data), 500
+
 
 # 登入 API
-@app.route("/api/signin", methods=['POST'])
+@app.route("/api/user/auth", methods=['PUT'])
 def signIn():
-	account = request.json.get('account')
+	email = request.json.get('email')
 	password = request.json.get('password')
 	sql = 'SELECT * FROM member WHERE account = %s and password = %s'
-	mycursor.execute(sql, (account,password))
+	mycursor.execute(sql, (email,password))
 	user_data = mycursor.fetchone()
-	print(user_data)
 
-	if user_data:
-		id, name, email, password = user_data
-		user_identity = {
-			"id" : id,
-			"name" : name,
-			"account" : email,
-		}
-		access_token = create_access_token(identity = user_identity)
-		data = {
-			"message": "登入成功！網頁重新載入中...",
-			"access_token" : access_token
+	try:
+		if user_data:
+			id, name, email, password = user_data
+			user_identity = {
+				"id" : id,
+				"name" : name,
+				"email" : email,
 			}
-		return jsonify(data)
-	else:
-		data = {'message': '登入失敗'}
-		return jsonify(data), 401
+			access_token = create_access_token(identity = user_identity)
+			data = {
+				"token" : access_token
+				}
+			return jsonify(data), 200
+		else:
+			data = {
+				"error": True,
+  				"message": "帳號或密碼錯誤"
+				}
+			return jsonify(data), 400
+		
+	except Exception as e:
+		data = {
+			"error": True,
+  			"message": "伺服器內部錯誤"
+		}
+		return jsonify(message='"error'), 500
+
 	
-@app.route('/api/verifyToken', methods=['GET'])
+@app.route('/api/user/auth', methods=['GET'])
 @jwt_required()
 def verifyToken():
 	try:
 		# 取得 token 內的資料
 		current_user = get_jwt_identity()
-		print(current_user)
 
 		if current_user:
 			# 從用戶資訊回傳給前端
 			user_id = current_user['id']
 			user_name = current_user['name']
-			user_account = current_user['account']
+			user_email = current_user['email']
 
-			response_data = {
+			data = {
 				'id' : user_id,
 				'name' : user_name,
-				'account' : user_account,
+				'email' : user_email,
 			}
+			response_data = {"data" : data}
 			return jsonify(response_data), 200
 		
 		else:
-			return jsonify(message = "Token 驗證失效，請重新登入"), 401
+			data = { data : None }
+			return jsonify(data)
 		
 	except Exception as e:
 		return jsonify(message='"error'), 401

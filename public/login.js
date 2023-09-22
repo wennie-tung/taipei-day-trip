@@ -11,7 +11,7 @@ async function verifyToken() {
   const signIn = document.querySelector("#signIn");
   const signOut = document.querySelector("#signOut");
   try {
-    const response = await fetch("/api/verifyToken", {
+    const response = await fetch("/api/user/auth", {
       methods: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -87,13 +87,13 @@ signUpButton.addEventListener("click", async function () {
   } else {
     const userData = {
       name: signUpName,
-      account: signUpAccount,
+      email: signUpAccount,
       password: signUpPassword,
     };
 
     try {
-      // 發送 POST 請求到 /api/signup
-      const response = await fetch("/api/signup", {
+      // 發送 POST 請求到 /api/user
+      const response = await fetch("/api/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,12 +103,12 @@ signUpButton.addEventListener("click", async function () {
 
       // 註冊成功 (200)
       const data = await response.json();
-      if (!response.ok) {
+      if (!data.ok) {
         signUpMsg.style.display = "block";
         signUpMsg.textContent = data.message;
       } else {
         signUpMsg.style.display = "block";
-        signUpMsg.textContent = data.message;
+        signUpMsg.textContent = "註冊成功，請重新登入";
       }
     } catch (error) {
       console.error("註冊失敗:", error);
@@ -118,25 +118,24 @@ signUpButton.addEventListener("click", async function () {
 
 // 登入
 signInButton.addEventListener("click", async function () {
-  console.log('test')
   event.preventDefault();
   const signInAccount = signInForm.elements.signInAccount.value;
   const signInPassword = signInForm.elements.signInPassword.value;
   const signInMsg = document.querySelector(".signInMsg");
 
-  // 檢查註冊表單填寫，任一空值阻擋行為
+  // 檢查登入表單填寫，任一空值阻擋行為
   if (signInAccount == "" || signInPassword == "") {
     signInMsg.style.display = "block";
     signInMsg.textContent = "電子信箱及密碼不可為空";
   } else {
     const userData = {
-      account: signInAccount,
+      email: signInAccount,
       password: signInPassword,
     };
 
     try {
-      const response = await fetch("/api/signin", {
-        method: "POST",
+      const response = await fetch("/api/user/auth", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -146,10 +145,9 @@ signInButton.addEventListener("click", async function () {
       // 登入成功
       const data = await response.json();
       if (response.ok) {
-        console.log("登入成功");
         signInMsg.style.display = "block";
-        signInMsg.textContent = data.message;
-        localStorage.setItem("access_token", data.access_token);
+        signInMsg.textContent = "登入成功！網頁重新加載中...";
+        localStorage.setItem("access_token", data.token);
         setTimeout(function () {
           window.location.reload();
         }, 2000);
