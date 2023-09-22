@@ -118,10 +118,10 @@ def getMrt():
 @app.route("/api/user", methods=['POST'])
 def signUp():
 	name = request.json.get('name')
-	account = request.json.get('email')
+	email = request.json.get('email')
 	password = request.json.get('password')
-	sql = 'SELECT * FROM member WHERE account = %s'
-	mycursor.execute(sql, (account,))
+	sql = 'SELECT * FROM member WHERE email = %s'
+	mycursor.execute(sql, (email,))
 	existing_account = mycursor.fetchall()
 
 	try:
@@ -132,8 +132,8 @@ def signUp():
 				}
 			return jsonify(data), 400
 		else:
-			sql = 'INSERT INTO member(name, account, password) VALUES(%s, %s, %s)'
-			val = (name, account, password)
+			sql = 'INSERT INTO member(name, email, password) VALUES(%s, %s, %s)'
+			val = (name, email, password)
 			mycursor.execute(sql, val)
 			mydb.commit()
 			data = {'ok': 'true'}
@@ -152,7 +152,7 @@ def signUp():
 def signIn():
 	email = request.json.get('email')
 	password = request.json.get('password')
-	sql = 'SELECT * FROM member WHERE account = %s and password = %s'
+	sql = 'SELECT * FROM member WHERE email = %s and password = %s'
 	mycursor.execute(sql, (email,password))
 	user_data = mycursor.fetchone()
 
