@@ -20,7 +20,8 @@
             <div class="header">台北一日遊</div>
             <div class="list">
                 <div>預定行程</div>
-                <div>登入/註冊</div>
+                <div id="signIn">登入/註冊</div>
+                <div id="signOut">登出系統</div>
             </div>
         </div>
     </div>
@@ -59,11 +60,48 @@
         <div class="loader"></div>
     </div>
 
+    <!-- sign in box -->
+    <div class="signInBoxContainer">
+        <div class="signInBox">
+            <div class="decoratorBar"></div>
+            <form class="signInForm" id="signInForm">
+                <div class="signInTextContainer">
+                    <div class="signInTitle">登入會員帳號</div>
+                    <img src="/icon_close.png" alt="icon_close" class="closeIcon" id="closeSignIn">
+                    <input type="email" name="signInAccount" placeholder="輸入電子信箱" class="accountInput">
+                    <input type="password" name="signInPassword" placeholder="輸入密碼" class="accountInput">
+                    <button type="button" id="signInButton">登入帳戶</button>
+                    <div class="signInMsg"></div>
+                    <div class="goToSignUp">還沒有帳戶？點此註冊</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- sign up box -->
+    <div class="signUpBoxContainer">
+        <div class="signUpBox">
+            <div class="decoratorBar"></div>
+            <form class="signInForm" id="signUpForm">
+                <div class="signInTextContainer">
+                    <div class="signInTitle">註冊會員帳號</div>
+                    <img src="/icon_close.png" alt="icon_close" class="closeIcon" id="closeSignUp">
+                    <input type="text" name="signUpName" placeholder="輸入姓名" class="accountInput">
+                    <input type="email" name="signUpAccount" placeholder="輸入電子郵件" class="accountInput">
+                    <input type="password" name="signUpPassword" placeholder="輸入密碼" class="accountInput">
+                    <button type="button" id="signUpButton">註冊新帳戶</button>
+                    <div class="signUpMsg"></div>
+                    <div class="goToSignIn">已經有帳戶了？點此登入</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- footer -->
     <footer>
         <div class="footerText">COPYRIGHT © 2021 台北一日遊</div>
     </footer>
-
+    <script src="/login.js"></script>
 </body>
 
 <script>
@@ -71,6 +109,7 @@
     const PROD_API_PATH = "http://13.238.60.107:3000";
     const DEV_API_PATH = "http://127.0.0.1:3000";
     let nextPage = 0;
+
 
     // 一進入頁面就要載入資料
     // 使用 async, await 處理異步程式碼
@@ -80,11 +119,11 @@
             renderMrts(mrts);
             const attractions = await getAttractionsData(0, '');
             renderAttractions(attractions);
-
         } catch (error) {
             console.error('An error occurred:', error);
         }
     });
+
 
     // fetch 取得捷運站 API 資料 
     // 使用 async, await 處理異步程式碼
@@ -119,7 +158,7 @@
                 const attractions = await getAttractionsData(0, mrt);
                 let mrtAttractions = [];
                 attractions.forEach((attraction) => {
-                    if (mrt === attraction.mrt){
+                    if (mrt === attraction.mrt) {
                         const attractionsContainer = document.querySelector('.attractions');
                         mrtAttractions.push(attraction);
                         // 先把原本的清掉
@@ -233,12 +272,12 @@
     // 顯示 loading 遮罩
     function showLoading() {
         if (loadingOverLay) {
-            loadingOverLay.style.display = "flex"; 
+            loadingOverLay.style.display = "flex";
         }
     }
     // 隱藏 loading 遮罩
-    function hideLoading(){
-        if (loadingOverLay){
+    function hideLoading() {
+        if (loadingOverLay) {
             loadingOverLay.style.display = "none";
         }
     }
