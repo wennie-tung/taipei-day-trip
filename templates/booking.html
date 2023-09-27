@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wennie Tung">
+    <title>Taipei Trip 台北一日遊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- navigation -->
+    <div class="navigationFrame">
+        <div class="navigationBar">
+            <div class="header">台北一日遊</div>
+            <div class="list">
+                <div id="goToBooking">預定行程</div>
+                <div id="signIn">登入/註冊</div>
+                <div id="signOut">登出系統</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1000px Main Content-->
+    <div class="container" id="bookingContainer">
+        <div class="haedline">
+            您好，<span>Wennie</span>，待預定的行程如下：
+        </div>
+
+        <!-- yes 有預訂行程時 -->
+        <div id="hadbooking">
+            <div class="bookingSection">
+                <div class="bookingPic"><img src="/logan.jpg"></div>
+                <div class="bookigInfo">
+                    <div class="bookingName">
+                        台北一日遊：
+                        <span>平安鐘</span>
+                    </div>
+                    <div class="allInfos">
+                        <div class="F16-700 C666666">
+                            日期：
+                            <span class="F16-500 C666666">2021-04-23</span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            時間：
+                            <span class="F16-500 C666666">早上 9 點到下午 4 點</span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            費用：
+                            <span class="F16-500 C666666">新台幣 2000 元</span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            地點：
+                            <span class="F16-500 C666666">臺北市 大安區忠孝東路4段</span>
+                        </div>
+                    </div>
+                </div>
+                <img src="/icon_delete.png" alt="刪除預訂行程" class="icon_delete">
+            </div>
+
+            <hr/>
+
+            <!-- contact form -->
+            <form id="contactForm">
+                <div class="F19-700 C666666">您的聯絡資訊</div>
+                <div>
+                    <label class="F16-500 C666666">聯絡姓名：</label>
+                    <input type="text">
+                </div>
+                <div>
+                    <label class="F16-500 C666666">聯絡信箱：</label>
+                    <input type="email">
+                </div>
+                <div>
+                    <label class="F16-500 C666666">手機號碼：</label>
+                    <input type="tel">
+                </div>
+                <div class="F16-700 C666666">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+            </form>
+
+            <hr/>
+
+            <!-- payment form -->
+            <form id="paymentForm">
+                <div class="F19-700 C666666">信用卡付款資訊</div>
+                <div>
+                    <label class="F16-500 C666666">卡片號碼：</label>
+                    <input type="password" placeholder="**** **** **** ****">
+                </div>
+                <div>
+                    <label class="F16-500 C666666">過期時間：</label>
+                    <input type="number" placeholder="MM / YY">
+                </div>
+                <div>
+                    <label class="F16-500 C666666">驗證密碼：</label>
+                    <input type="text" placeholder="CVV">
+                </div>
+            </form>
+
+            <hr/>
+
+            <div class="confirm">
+                <div class="F16-700 C666666">
+                    總價：
+                    <span>新台幣 2000 元</span>
+                </div>
+                <button>確認訂購並付款</button>
+            </div>
+        </div>
+
+         <!-- no 沒預訂行程時 -->
+         <div class="F16-500 C666666" id="noBooking">
+            目前沒有任何待預訂的行程
+        </div>
+
+    </div>
+
+    <!-- sign in box -->
+    <div class="signInBoxContainer">
+        <div class="signInBox">
+            <div class="decoratorBar"></div>
+            <form class="signInForm" id="signInForm">
+                <div class="signInTextContainer">
+                    <div class="signInTitle">登入會員帳號</div>
+                    <img src="/icon_close.png" alt="icon_close" class="closeIcon" id="closeSignIn">
+                    <input type="email" name="signInAccount" placeholder="輸入電子信箱" class="accountInput">
+                    <input type="password" name="signInPassword" placeholder="輸入密碼" class="accountInput">
+                    <button type="button" id="signInButton">登入帳戶</button>
+                    <div class="signInMsg"></div>
+                    <div class="goToSignUp">還沒有帳戶？點此註冊</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- sign up box -->
+    <div class="signUpBoxContainer">
+        <div class="signUpBox">
+            <div class="decoratorBar"></div>
+            <form class="signInForm" id="signUpForm">
+                <div class="signInTextContainer">
+                    <div class="signInTitle">註冊會員帳號</div>
+                    <img src="/icon_close.png" alt="icon_close" class="closeIcon" id="closeSignUp">
+                    <input type="text" name="signUpName" placeholder="輸入姓名" class="accountInput">
+                    <input type="email" name="signUpAccount" placeholder="輸入電子郵件" class="accountInput">
+                    <input type="password" name="signUpPassword" placeholder="輸入密碼" class="accountInput">
+                    <button type="button" id="signUpButton">註冊新帳戶</button>
+                    <div class="signUpMsg"></div>
+                    <div class="goToSignIn">已經有帳戶了？點此登入</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <div class="footerText">COPYRIGHT © 2021 台北一日遊</div>
+    </footer>
+
+    <script src="/login.js"></script>
+</body>
+<script>
+    const PROD_API_PATH = "http://13.238.60.107:3000";
+    const DEV_API_PATH = "http://127.0.0.1:3000";
+
+    // 標題回首頁
+    const header = document.querySelector('.header');
+    header.addEventListener('click', function () {
+        window.location.href = `${DEV_API_PATH}`
+    })
+
+
+</script>
+</html>

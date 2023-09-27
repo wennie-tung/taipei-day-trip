@@ -5,6 +5,7 @@ app = Flask(__name__, static_folder="public", static_url_path="/")
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 app.config['JWT_SECRET_KEY'] = 'wehelp-taipei-day-trip'
+
 # Token 時效性 7 天
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 604800
 jwt = JWTManager(app)
@@ -12,7 +13,7 @@ jwt = JWTManager(app)
 # 連接到本機的 MySQL
 mydb = mysql.connector.connect(
     host="localhost",
-    user="wennie",
+    user="root",
     password="password",
     database="websiteTT"
 )
@@ -210,7 +211,42 @@ def verifyToken():
 			return jsonify(data)
 		
 	except Exception as e:
-		return jsonify(message='"error'), 401
+		return jsonify(message='error'), 401
+	
+
+# booking API
+# @app.route('/api/booking', methods=['GET'])
+# def 
+
+# 建立新的預訂行程
+@app.route('/api/booking', methods=['POST'])
+@jwt_required()
+def creatBooking():
+	try:
+		current_member = get_jwt_identity()
+		member = current_member
+	
+		if member:
+			# 從用戶資訊回傳給前端
+			memberId = member['id']
+			print(memberId)
+		else:
+			data = { data : None }
+			return jsonify(data)
+		
+		# print('user_id:' + user_id)
+		attractionId = request.json.get('attractionId')
+		date = request.json.get('date')
+		time = request.json.get('time')
+		price = request.json.get('price')
+		print(attractionId, date, time, price)
+		data = {'ok': 'true'}
+		return jsonify(data)
+	except Exception as e:
+		return jsonify(message='"error'), 500
+
+# @app.route('/api/booking', methods=['DELETE'])
+
 	
 
 app.run(host="0.0.0.0", debug=True, port=3000)
