@@ -153,6 +153,7 @@
     let dots;
     let attractionIdData;
 
+
     // find attraction id
     let attractionId = {{ request.view_args.id }};
     // when DOM finish loaded : 
@@ -176,7 +177,7 @@
 
     // fetch : get attraction data
     async function getAttractionIdData() {
-        const response = await fetch(`${DEV_API_PATH}/api/attraction/${attractionId}`);
+        const response = await fetch(`${PROD_API_PATH}/api/attraction/${attractionId}`);
         const data = await response.json();
         attractionIdData = data.data;
         return data.data;
@@ -184,7 +185,7 @@
 
     // render : 右邊 景點資訊 & discription
     function renderAttractionInfo(data) {
-        console.log(data);
+        // console.log(data);
         const name = document.querySelector('.title');
         const cateAndMrt = document.querySelector('.infromation');
         const description = document.querySelector('#description');
@@ -288,7 +289,7 @@
     // 標題回首頁
     const header = document.querySelector('.header');
     header.addEventListener('click', function () {
-        window.location.href = `${DEV_API_PATH}`
+        window.location.href = '/';
     })
 
     // 開始預訂 button 監聽事件
@@ -304,7 +305,7 @@
 
     // 開始預訂
     async function startBooking() {
-        console.log(attractionIdData);
+        // console.log(attractionIdData);
         const bookingDate = document.querySelector('.bookingDate');
         const bookingDateInput = bookingDate.value;
         const radioButtons = document.querySelectorAll('input[type="radio"][name="bookingTime"]');
@@ -323,10 +324,11 @@
             time: bookingTimeSelect,
             price: price
         }
-        console.log(bookingData);
+        // console.log(bookingData);
+
         try {
             let token = localStorage.getItem("access_token");
-            console.log(token)
+            // console.log(token)
             const response = await fetch('/api/booking', {
                 method : "POST",
                 headers: {
@@ -337,6 +339,13 @@
                 body: JSON.stringify(bookingData),
             });
 
+            if(response.ok){
+                alert('已加入預訂行程的購物車囉！');
+                window.location.href = '/booking'
+            } else {
+                alert('預訂失敗，請重新預訂');
+            }
+            
         } catch (error) {
             console.error("預訂失敗:", error);
         }

@@ -52,6 +52,7 @@ a {
     font-size: 30px;
     font-weight: 700;
     line-height: 34px;
+    cursor: pointer;
 }
 
 .list{
@@ -291,6 +292,12 @@ footer{
     font-size: 16px;
     font-weight: bold;
     color: #ffffff;
+}
+
+.footer-100vh {
+    height: 100vh;
+    align-items: start;
+    padding-top: 40px;
 }
 
 /* loading */
@@ -730,8 +737,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #666666;
 }
 
-#hadbooking{
-    padding: 0px 10px
+#hadBooking{
+    padding: 0px 10px;
+    display: none;
 }
 
 .bookingSection{
@@ -777,12 +785,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 30px;
     height: 30px;
     position: relative;
+    cursor: pointer;
 
 }
 
 #noBooking{
-    display: none;
+    display: block;
     margin-top: 35px;
+    padding: 0px 10px;
 }
 
 #contactForm {

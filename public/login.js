@@ -1,53 +1,56 @@
-
 let token = localStorage.getItem("access_token");
-document.addEventListener("DOMContentLoaded",async function(){
+let userData = {};
+document.addEventListener("DOMContentLoaded", async function () {
   if (token) {
     // 如果有 token 代表使用者曾經登入過
     // 接下來驗證 token 是否有效
     let isLogin = await verifyToken();
-    if(isLogin){
-      console.log("登入成功")
+    if (isLogin) {
+      console.log("登入成功");
       const signIn = document.querySelector("#signIn");
       const signOut = document.querySelector("#signOut");
       signOut.style.display = "block";
       signIn.style.display = "none";
       // 開啟預定行程購物車 /booking 頁面
       const goToBooking = document.getElementById("goToBooking");
-      goToBooking.addEventListener('click', function(){
-        window.location.href = '/booking';
-      })
-    } else{
+      goToBooking.addEventListener("click", async function () {
+        window.location.href = "/booking";
+        await getOrderData();
+      });
+    } else {
       console.log("Token 無效，請重新登入");
-      localStorage.removeItem('access_token');
+      localStorage.removeItem("access_token");
     }
   } else {
     console.log("尚未登入過");
-    goToBooking.addEventListener('click', function(){
-      signInBox.style.display = 'flex';
+    goToBooking.addEventListener("click", function () {
+      signInBox.style.display = "flex";
     });
   }
-})
+});
 
 // 驗證 Token
 async function verifyToken() {
   try {
-    if(token){
+    if (token) {
       const response = await fetch("/api/user/auth", {
         methods: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         console.log("Token 無效，請重新登入");
-        localStorage.removeItem('access_token');
+        localStorage.removeItem("access_token");
         return false;
       }
       // 處理 API 回傳的資料
       const data = await response.json();
+      userData = data.data;
+      // console.log(userData);
       return true;
-    } else{
+    } else {
       console.log("尚未登入過");
     }
   } catch (error) {
@@ -196,5 +199,3 @@ signOut.addEventListener("click", function () {
     window.location.reload();
   }, 1000);
 });
-
-

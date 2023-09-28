@@ -13,7 +13,7 @@ jwt = JWTManager(app)
 # 連接到本機的 MySQL
 mydb = mysql.connector.connect(
     host="localhost",
-    user="root",
+    user="wennie",
     password="password",
     database="websiteTT"
 )
@@ -137,7 +137,7 @@ def signUp():
 			val = (name, email, password)
 			mycursor.execute(sql, val)
 			mydb.commit()
-			data = {'ok': 'true'}
+			data = {'ok': True}
 			return jsonify(data)
 		
 	except Exception as e:
@@ -182,7 +182,7 @@ def signIn():
 			"error": True,
   			"message": "伺服器內部錯誤"
 		}
-		return jsonify(message='"error'), 500
+		return jsonify(message='error'), 500
 
 	
 @app.route('/api/user/auth', methods=['GET'])
@@ -215,8 +215,72 @@ def verifyToken():
 	
 
 # booking API
-# @app.route('/api/booking', methods=['GET'])
-# def 
+@app.route('/api/booking', methods=['GET'])
+@jwt_required()
+def getOrderData():
+	try:
+		current_member = get_jwt_identity()
+		member = current_member
+		memberId = member['id']
+
+		# 查詢資料庫
+		mycursor = mydb.cursor(dictionary=True)
+		sql = 'SELECT * FROM orders WHERE memberId = %s'
+		mycursor.execute(sql, (memberId,))
+		hadBooking = mycursor.fetchall()
+
+		if hadBooking:
+			for booking in hadBooking:
+				attractionId = booking['attractionId']
+				orderDate = booking['date']
+				orderTime = booking['time']
+				orderPrice = booking['price']
+			
+			mycursor = mydb.cursor(dictionary=True)
+			sql = 'SELECT * FROM attraction WHERE id = %s'
+			mycursor.execute(sql, (attractionId,))
+			attractionResult = mycursor.fetchall()
+			for result in attractionResult:
+				attractionName = result['name']
+				attractionAddress = result['address']
+				attractionImages = json.loads(result['images'])  # 解析 "images" 欄位中的 JSON 字串
+				if attractionImages:
+					attractionImage = attractionImages[0]  # 取得第一個網址
+				else:
+					attractionImage = None # 如果沒有圖片，將其設為 None 或其他適當的值
+
+			attraction = {
+					"id": attractionId,
+					"name": attractionName,
+					"address": attractionAddress,
+					"image": attractionImage,
+				}
+
+			data = {
+				"attraction": attraction,
+				"date" : orderDate,
+				"time" : orderTime,
+				"price" : orderPrice,
+			}
+			response_data = {"data" : data}
+
+			return jsonify(response_data), 200
+
+		else:
+			response_data = {"data" : None}
+			return jsonify(response_data), 200
+	
+	except Exception as e:
+		return jsonify(message='error')
+
+# 自訂錯誤處理程序
+@jwt.invalid_token_loader
+def custom_jwt_error(error):
+    data = {
+	    "error":True, 
+		"message": "未登入系統，拒絕存取"
+	}
+    return jsonify(data), 403
 
 # 建立新的預訂行程
 @app.route('/api/booking', methods=['POST'])
@@ -225,28 +289,83 @@ def creatBooking():
 	try:
 		current_member = get_jwt_identity()
 		member = current_member
-	
-		if member:
-			# 從用戶資訊回傳給前端
-			memberId = member['id']
-			print(memberId)
-		else:
-			data = { data : None }
-			return jsonify(data)
-		
-		# print('user_id:' + user_id)
 		attractionId = request.json.get('attractionId')
 		date = request.json.get('date')
 		time = request.json.get('time')
 		price = request.json.get('price')
-		print(attractionId, date, time, price)
-		data = {'ok': 'true'}
-		return jsonify(data)
-	except Exception as e:
-		return jsonify(message='"error'), 500
-
-# @app.route('/api/booking', methods=['DELETE'])
-
 	
+		if member:
+			try:
+				memberId = member['id']
+				sql = 'SELECT * FROM orders WHERE memberId = %s'
+				mycursor.execute(sql, (memberId,))
+				bookedBefore = mycursor.fetchone()
+
+				if bookedBefore:
+					sql = 'UPDATE orders SET attractionId = %s, date = %s, time = %s, price = %s WHERE memberId = %s'
+					val = (attractionId, date, time, price, memberId)
+					mycursor.execute(sql, val)
+					mydb.commit()
+					data = {'ok': True}
+					return jsonify(data), 200
+				else:
+					sql = 'INSERT INTO orders(memberId, attractionId, date, time, price) VALUES(%s, %s, %s, %s, %s)'
+					val = (memberId, attractionId, date, time, price)
+					mycursor.execute(sql, val)
+					mydb.commit()
+					data = {'ok': True}
+					return jsonify(data), 200
+			
+			except mysql.connector.Error as err:
+				# 資料庫操作發生異常，處理錯誤
+				print(f"資料庫錯誤: {err}")
+				# 回復到資料操作之前的狀態
+				mydb.rollback() 
+				# 回傳錯誤訊息
+				data = {
+					"error":True, 
+					"message": "建立失敗，輸入不正確或其他原因"
+					}
+				return jsonify(data), 400
+	
+	except Exception as e:
+		data = {
+			"error": True,
+  			"message": "伺服器內部錯誤"
+		}
+		return jsonify(message='error'), 500
+
+@app.route('/api/booking', methods=['DELETE'])
+@jwt_required()
+def deleteOrderData():
+	try:
+		current_member = get_jwt_identity()
+		member = current_member
+		memberId = member['id']
+
+		if member:
+			try:
+				memberId = member['id']
+				sql = 'DELETE FROM orders WHERE memberId = %s'
+				mycursor.execute(sql, (memberId,))
+				mydb.commit()
+				data = {'ok': True}
+				return jsonify(data), 200
+
+			except Exception as e:
+				data = {
+					"error": True,
+  					"message": "伺服器內部錯誤"
+				}
+				return jsonify(message='error'), 500
+
+	except Exception as e:
+		data = {
+			"error": True,
+  			"message": "伺服器內部錯誤"
+		}
+		return jsonify(message='error'), 500
+
+
 
 app.run(host="0.0.0.0", debug=True, port=3000)
