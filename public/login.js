@@ -1,30 +1,58 @@
 let token = localStorage.getItem("access_token");
-if (token) {
-  // 如果有 token 代表使用者曾經登入過
-  // 接下來驗證 token 是否有效
-  verifyToken();
-} else {
-  console.log("尚未登入過");
-}
+let userData = {};
+document.addEventListener("DOMContentLoaded", async function () {
+  if (token) {
+    // 如果有 token 代表使用者曾經登入過
+    // 接下來驗證 token 是否有效
+    let isLogin = await verifyToken();
+    if (isLogin) {
+      console.log("登入成功");
+      const signIn = document.querySelector("#signIn");
+      const signOut = document.querySelector("#signOut");
+      signOut.style.display = "block";
+      signIn.style.display = "none";
+      // 開啟預定行程購物車 /booking 頁面
+      const goToBooking = document.getElementById("goToBooking");
+      goToBooking.addEventListener("click", async function () {
+        window.location.href = "/booking";
+        await getOrderData();
+      });
+    } else {
+      console.log("Token 無效，請重新登入");
+      localStorage.removeItem("access_token");
+    }
+  } else {
+    console.log("尚未登入過");
+    goToBooking.addEventListener("click", function () {
+      signInBox.style.display = "flex";
+    });
+  }
+});
+
 // 驗證 Token
 async function verifyToken() {
-  const signIn = document.querySelector("#signIn");
-  const signOut = document.querySelector("#signOut");
   try {
-    const response = await fetch("/api/user/auth", {
-      methods: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    if (token) {
+      const response = await fetch("/api/user/auth", {
+        methods: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error("Token 無效，請重新登入");
+      if (!response.ok) {
+        console.log("Token 無效，請重新登入");
+        localStorage.removeItem("access_token");
+        return false;
+      }
+      // 處理 API 回傳的資料
+      const data = await response.json();
+      userData = data.data;
+      // console.log(userData);
+      return true;
+    } else {
+      console.log("尚未登入過");
     }
-    // 處理 API 回傳的資料
-    const data = await response.json();
-    signIn.style.display = "none";
-    signOut.style.display = "block";
   } catch (error) {
     console.error("發生錯誤：", error);
   }
