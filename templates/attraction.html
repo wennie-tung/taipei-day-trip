@@ -177,7 +177,7 @@
 
     // fetch : get attraction data
     async function getAttractionIdData() {
-        const response = await fetch(`${PROD_API_PATH}/api/attraction/${attractionId}`);
+        const response = await fetch(`${DEV_API_PATH}/api/attraction/${attractionId}`);
         const data = await response.json();
         attractionIdData = data.data;
         return data.data;
@@ -305,7 +305,7 @@
 
     // 開始預訂
     async function startBooking() {
-        // console.log(attractionIdData);
+        console.log(attractionIdData);
         const bookingDate = document.querySelector('.bookingDate');
         const bookingDateInput = bookingDate.value;
         const radioButtons = document.querySelectorAll('input[type="radio"][name="bookingTime"]');
@@ -341,10 +341,10 @@
 
             if(response.ok){
                 alert('已加入預訂行程的購物車囉！');
-                window.location.href = '/booking'
+                window.location.href = '/booking';
             } else {
                 alert('預訂失敗，請重新預訂');
-            }
+            };
             
         } catch (error) {
             console.error("預訂失敗:", error);

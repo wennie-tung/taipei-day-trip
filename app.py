@@ -13,7 +13,7 @@ jwt = JWTManager(app)
 # 連接到本機的 MySQL
 mydb = mysql.connector.connect(
     host="localhost",
-    user="wennie",
+    user="root",
     password="password",
     database="websiteTT"
 )
@@ -32,6 +32,9 @@ def booking():
 @app.route("/thankyou")
 def thankyou():
 	return render_template("thankyou.html")
+@app.route("/test")
+def test():
+	return render_template("test.html")
 
 # API
 @app.route("/api/attractions", methods=['GET'])
@@ -217,7 +220,7 @@ def verifyToken():
 # booking API
 @app.route('/api/booking', methods=['GET'])
 @jwt_required()
-def getOrderData():
+def getBookingData():
 	try:
 		current_member = get_jwt_identity()
 		member = current_member
@@ -225,7 +228,7 @@ def getOrderData():
 
 		# 查詢資料庫
 		mycursor = mydb.cursor(dictionary=True)
-		sql = 'SELECT * FROM orders WHERE memberId = %s'
+		sql = 'SELECT * FROM booking WHERE memberId = %s'
 		mycursor.execute(sql, (memberId,))
 		hadBooking = mycursor.fetchall()
 
@@ -273,6 +276,7 @@ def getOrderData():
 	except Exception as e:
 		return jsonify(message='error')
 
+
 # 自訂錯誤處理程序
 @jwt.invalid_token_loader
 def custom_jwt_error(error):
@@ -282,10 +286,11 @@ def custom_jwt_error(error):
 	}
     return jsonify(data), 403
 
+
 # 建立新的預訂行程
 @app.route('/api/booking', methods=['POST'])
 @jwt_required()
-def creatBooking():
+def createBooking():
 	try:
 		current_member = get_jwt_identity()
 		member = current_member
@@ -297,19 +302,19 @@ def creatBooking():
 		if member:
 			try:
 				memberId = member['id']
-				sql = 'SELECT * FROM orders WHERE memberId = %s'
+				sql = 'SELECT * FROM booking WHERE memberId = %s'
 				mycursor.execute(sql, (memberId,))
 				bookedBefore = mycursor.fetchone()
 
 				if bookedBefore:
-					sql = 'UPDATE orders SET attractionId = %s, date = %s, time = %s, price = %s WHERE memberId = %s'
+					sql = 'UPDATE booking SET attractionId = %s, date = %s, time = %s, price = %s WHERE memberId = %s'
 					val = (attractionId, date, time, price, memberId)
 					mycursor.execute(sql, val)
 					mydb.commit()
 					data = {'ok': True}
 					return jsonify(data), 200
 				else:
-					sql = 'INSERT INTO orders(memberId, attractionId, date, time, price) VALUES(%s, %s, %s, %s, %s)'
+					sql = 'INSERT INTO booking(memberId, attractionId, date, time, price) VALUES(%s, %s, %s, %s, %s)'
 					val = (memberId, attractionId, date, time, price)
 					mycursor.execute(sql, val)
 					mydb.commit()
@@ -337,7 +342,7 @@ def creatBooking():
 
 @app.route('/api/booking', methods=['DELETE'])
 @jwt_required()
-def deleteOrderData():
+def deleteBookingData():
 	try:
 		current_member = get_jwt_identity()
 		member = current_member
@@ -346,7 +351,7 @@ def deleteOrderData():
 		if member:
 			try:
 				memberId = member['id']
-				sql = 'DELETE FROM orders WHERE memberId = %s'
+				sql = 'DELETE FROM booking WHERE memberId = %s'
 				mycursor.execute(sql, (memberId,))
 				mydb.commit()
 				data = {'ok': True}
@@ -365,6 +370,41 @@ def deleteOrderData():
   			"message": "伺服器內部錯誤"
 		}
 		return jsonify(message='error'), 500
+	
+# order API
+@app.route('/api/orders', methods=['POST'])
+@jwt_required()
+def createNewOrder():
+	try:
+		current_member = get_jwt_identity()
+		member = current_member
+		
+		
+		# response_data = {
+		# 	number : ,
+		# 	payment : {
+		# 		status : 0,
+		# 		message : "付款成功",
+		# 	}
+		# }
+
+		# data = {
+		# 	data : response_data,
+		# }
+		return jsonify(data), 200
+
+
+	except Exception as e:
+		data = {
+			"error": True,
+  			"message": "伺服器內部錯誤"
+		}
+		return jsonify(data), 500
+
+# @app.route('/api/orders/<int:orderNumber>', methods=['GET'])
+# def orderData():
+
+
 
 
 
