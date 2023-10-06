@@ -87,23 +87,22 @@
 
             <!-- payment form -->
             <form id="paymentForm">
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
-                </div>
+                <div class="F19-700 C666666">信用卡付款資訊</div>
                 <div class="form-group card-number-group">
-                    <label for="card-number" class="control-label"><span id="cardtype"></span>卡號</label>
-                    <div class="form-control card-number"></div>
+                    <label for="card-number" class="F16-500 C666666"><span id="cardtype"></span>卡片號碼：</label>
+                    <div class="paymentFormInput" id="card-number"></div>
+                    <!-- <div class="form-control card-number"></div> -->
                 </div>
                 <div class="form-group expiration-date-group">
-                    <label for="expiration-date" class="control-label">卡片到期日</label>
-                    <div class="form-control expiration-date" id="tappay-expiration-date"></div>
+                    <label for="expiration-date" class="F16-500 C666666">過期時間：</label>
+                    <div class="paymentFormInput" id="tappay-expiration-date"></div>
+                    <!-- <div class="form-control expiration-date" id="tappay-expiration-date"></div> -->
                 </div>
                 <div class="form-group ccv-group">
-                    <label for="ccv" class="control-label">卡片後三碼</label>
-                    <div class="form-control ccv"></div>
+                    <label for="ccv" class="F16-500 C666666">驗證密碼：</label>
+                    <div class="paymentFormInput" id="card-ccv"></div>
+                    <!-- <div class="form-control ccv"></div> -->
                 </div>
-                <button type="submit" class="btn btn-default">Pay</button>
             </form> 
 
             <hr />
@@ -114,7 +113,6 @@
                     <span class="ordersPrice F16-700 C666666">新台幣 2000 元</span>
                 </div>
                 <button id="confirmBookingBtn">確認訂購並付款</button>
-                <button type="submit" id="paymentBtn">付款</button>
             </div>
         </div>
 
@@ -383,13 +381,13 @@
         TPDirect.card.setup({
             fields: {
                 number: {
-                    element: '.form-control.card-number',
+                    element: '#card-number',
                 },
                 expirationDate: {
-                    element: document.getElementById('tappay-expiration-date'),
+                    element: '#tappay-expiration-date',
                 },
                 ccv: {
-                    element: document.querySelector('.form-control.ccv'),
+                    element: '#card-ccv'
                 }
             },
             styles: {
