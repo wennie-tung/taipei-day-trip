@@ -830,12 +830,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: end;
 }
 
-.confirm button{
+#confirmBookingBtn{
     width: 173px;
     height: 36px;
     border: none;
     border-radius: 5px;
-    background-color: #448899;
+    background-color: #AAA;
     box-sizing: border-box;
     padding: 10px 20px;
     font-size: 19px;
@@ -845,7 +845,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     justify-content: center;
     align-items: center;
     margin-top: 22px;
-    cursor: pointer;
+    cursor: not-allowed;
 }
 
 .F19-700{

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, json
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 import mysql.connector
+import requests, random, string
 app = Flask(__name__, static_folder="public", static_url_path="/")
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
@@ -228,7 +229,7 @@ def getBookingData():
 
 		# 查詢資料庫
 		mycursor = mydb.cursor(dictionary=True)
-		sql = 'SELECT * FROM booking WHERE memberId = %s'
+		sql = 'SELECT * FROM orders WHERE memberId = %s'
 		mycursor.execute(sql, (memberId,))
 		hadBooking = mycursor.fetchall()
 
@@ -302,19 +303,19 @@ def createBooking():
 		if member:
 			try:
 				memberId = member['id']
-				sql = 'SELECT * FROM booking WHERE memberId = %s'
+				sql = 'SELECT * FROM orders WHERE memberId = %s'
 				mycursor.execute(sql, (memberId,))
 				bookedBefore = mycursor.fetchone()
 
 				if bookedBefore:
-					sql = 'UPDATE booking SET attractionId = %s, date = %s, time = %s, price = %s WHERE memberId = %s'
+					sql = 'UPDATE orders SET attractionId = %s, date = %s, time = %s, price = %s WHERE memberId = %s'
 					val = (attractionId, date, time, price, memberId)
 					mycursor.execute(sql, val)
 					mydb.commit()
 					data = {'ok': True}
 					return jsonify(data), 200
 				else:
-					sql = 'INSERT INTO booking(memberId, attractionId, date, time, price) VALUES(%s, %s, %s, %s, %s)'
+					sql = 'INSERT INTO orders(memberId, attractionId, date, time, price) VALUES(%s, %s, %s, %s, %s)'
 					val = (memberId, attractionId, date, time, price)
 					mycursor.execute(sql, val)
 					mydb.commit()
@@ -351,7 +352,7 @@ def deleteBookingData():
 		if member:
 			try:
 				memberId = member['id']
-				sql = 'DELETE FROM booking WHERE memberId = %s'
+				sql = 'DELETE FROM orders WHERE memberId = %s'
 				mycursor.execute(sql, (memberId,))
 				mydb.commit()
 				data = {'ok': True}
@@ -378,21 +379,36 @@ def createNewOrder():
 	try:
 		current_member = get_jwt_identity()
 		member = current_member
-		
-		
-		# response_data = {
-		# 	number : ,
-		# 	payment : {
-		# 		status : 0,
-		# 		message : "付款成功",
-		# 	}
-		# }
+		memberId = member['id']
+		newOrderData = request.get_json()
+		result = verify_payment(newOrderData)
+		orderNumber = result['order_number']
+		print(orderNumber)
+		# print(result)
 
-		# data = {
-		# 	data : response_data,
-		# }
-		return jsonify(data), 200
-
+		if result['status'] == 0:
+			sql = 'UPDATE orders SET orderNumber = %s WHERE memberId = %s'
+			val = (orderNumber, memberId)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			response_data = {
+				"number" : orderNumber,
+				"payment" : {
+					"status" : 0,
+					"message" : "付款成功"
+				}
+			}
+			data = {
+				"data" : response_data,
+			}
+			return jsonify(data), 200
+		
+		else:
+			data = {
+				"error": True,
+  				"message": "訂單建立失敗"
+			}
+			return jsonify(data), 200
 
 	except Exception as e:
 		data = {
@@ -401,11 +417,97 @@ def createNewOrder():
 		}
 		return jsonify(data), 500
 
-# @app.route('/api/orders/<int:orderNumber>', methods=['GET'])
-# def orderData():
+@app.route('/api/orders/<int:orderNumber>', methods=['GET'])
+@jwt_required()
+def getOrderData():
+	try:
+		current_member = get_jwt_identity()
+		member = current_member
+		memberId = member['id']
+		mycursor = mydb.cursor(dictionary=True)
+		sql = 'SELECT * FROM orders WHERE memberId = %s'
+		val = ()
+		mycursor.execute(sql, val)
+		searchResult = mycursor.fetchone()
 
+		# attractionId 錯誤
+		if not searchResult:
+			return jsonify({"error": True, "message": "景點編號不正確"}), 400
 
+		# 使用 json.loads() 將 images 字串轉成 list
+		searchResult['images'] = json.loads(searchResult['images'])
 
+		data = {
+			"data":searchResult
+		}
+
+		if searchResult:
+			return jsonify(data)
+		
+	except Exception as e:
+		return jsonify({"error": True, "message": "伺服器內部錯誤"}), 500
+
+def verify_payment(newOrderData):
+	# 設置訂單編號
+	random_digits = ''.join(random.choice(string.digits) for _ in range(4))
+	orderDate = newOrderData['order']['date']
+	date = orderDate.replace("-", "")
+	order_number = date + random_digits 
+
+    # TapPay 付款 API 
+	api_url = 'https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime'
+
+    # partner key
+	partner_key = 'partner_opU2Vb6n9jmSyEbNRcLJ9eDN35cUEbIVRpnoj4nu0SwEbqlrdWifbeZP'
+	
+	# merchant id
+	merchant_id = "wehelpwennie_CTBC"
+
+    # 從POST請求中獲取用戶的Prime值 
+	prime = newOrderData['prime']
+
+    # 構建請求主體
+	payload = {
+        "partner_key": partner_key,
+        "prime": prime,
+        "amount": newOrderData['order']['price'],
+        "merchant_id": merchant_id,
+        "details": newOrderData['order']['trip']['attraction']['name'],
+		"order_number": order_number,
+        "cardholder": {
+            "phone_number": newOrderData['order']['contact']['phone'],
+            "name": newOrderData['order']['contact']['name'],
+            "email": newOrderData['order']['contact']['email'],
+        }
+    }
+
+    # 設置請求標頭
+	headers = {
+        'content-type': 'application/json',
+        'x-api-key': partner_key
+    }
+
+    # 發送POST請求
+	response = requests.post(api_url, json=payload, headers=headers)
+
+    # 獲取API的回應
+	api_response = response.json()
+
+    # 根據API回應做相應處理
+	if api_response.get('status') == 0:
+        # 付款驗證成功
+		print('付款驗證成功')
+		print(api_response)
+		data = {
+			"status" : 0,
+			"order_number" : api_response.get('order_number')
+		}
+		return data
+	else:
+        # 付款驗證失敗
+		print('付款驗證失敗')
+		print(api_response)
+        # return jsonify({"message": "Payment verification failed"})
 
 
 app.run(host="0.0.0.0", debug=True, port=3000)

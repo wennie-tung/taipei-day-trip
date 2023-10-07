@@ -175,6 +175,7 @@
         const deleteBtn = document.querySelector('.icon_delete');
         let data;
         let formattedPrice;
+        // let newOrderData;
 
         // 標題回首頁
         header.addEventListener('click', function () {
@@ -311,69 +312,6 @@
                 console.error("失敗:", error);
             }
         });
-
-        // 確認訂購，建立訂單 
-        confirmBookingBtn.addEventListener('click', async function () {
-            try {
-                let token = localStorage.getItem("access_token");
-                // console.log(userData)
-                // console.log(data);
-                const dateElement = document.getElementById('ordersDate');
-                const attractionData = data.attraction;
-                const date = dateElement.textContent;
-                const time = data.time;
-                const price = formattedPrice;
-                const contactName = document.getElementById('contactName').value;
-                const contactEmail = document.getElementById('contactEmail').value;
-                const contactPhone = document.getElementById('contactPhone').value;
-
-                const trip = {
-                    attraction: attractionData,
-                };
-
-                const contact = {
-                    name: contactName,
-                    email: contactEmail,
-                    phone: contactPhone,
-                };
-
-                const order = {
-                    price: price,
-                    trip: trip,
-                    date: date,
-                    time: time,
-                    contact: contact,
-                };
-                // console.log(order);
-
-                const newOrderData = {
-                    // prime : ,
-                    order,
-                };
-
-
-                console.log(newOrderData);
-
-                // const response = await fetch("/api/orders", {
-                //     method: "POST",
-                //     headers: {
-                //         Accept: 'application/json',
-                //         Authorization: `Bearer ${token}`,
-                //         "Content-Type": "application/json",
-                //     },
-                //     body: JSON.stringify(newOrderData),
-                // });
-
-                // if (response.ok) {
-                //     window.location.href = '/thankyou';
-                // } else {
-                //     alert('訂購失敗，請重新訂購');
-                // };
-
-            } catch (error) {
-                console.error("訂購失敗:", error);
-            }
-        })    
     </script>
     <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.17.0"></script>
     <script>
@@ -420,17 +358,18 @@
         });
 
         TPDirect.card.onUpdate(function (update) {
-            const submitButton = document.querySelector('button[type="submit"]');
-
             if (update.canGetPrime) {
-                submitButton.removeAttribute('disabled');
+                confirmBookingBtn.style.backgroundColor = '#448899';
+                confirmBookingBtn.style.cursor = 'pointer';
+                confirmBookingBtn.removeAttribute('disabled');
             } else {
-                submitButton.setAttribute('disabled', true);
+                confirmBookingBtn.setAttribute('disabled', true);
             }
 
             const cardTypes = ['mastercard', 'visa', 'jcb', 'amex', 'unionpay'];
             const newType = update.cardType === 'unknown' ? '' : update.cardType;
             document.getElementById('cardtype').textContent = newType;
+            console.log(newType);
 
             function setFormGroupStyle(selector, hasError, hasSuccess) {
                 const element = document.querySelector(selector);
@@ -444,24 +383,95 @@
         });
 
         confirmBookingBtn.addEventListener('click', function (event) {
-            event.preventDefault();
-            console.log('123')
-            forceBlurIos();
-            const tappayStatus = TPDirect.card.getTappayFieldsStatus();
-
-            if (!tappayStatus.canGetPrime) {
+            try {
+                verifyToken();
+                // event.preventDefault();
+                let token = localStorage.getItem("access_token");
+                forceBlurIos();
+                const tappayStatus = TPDirect.card.getTappayFieldsStatus();
+                if (!tappayStatus.canGetPrime) {
                 alert('can not get prime');
                 return;
+                }
+                TPDirect.card.getPrime(function (result) {
+                    if (result.status !== 0) {
+                        alert('get prime error ' + result.msg);
+                        return;
+                    }
+
+                    const dateElement = document.getElementById('ordersDate');
+                    const attractionData = data.attraction;
+                    const date = dateElement.textContent;
+                    const time = data.time;
+                    const price = formattedPrice;
+                    const contactName = document.getElementById('contactName').value;
+                    const contactEmail = document.getElementById('contactEmail').value;
+                    const contactPhone = document.getElementById('contactPhone').value;
+                    
+                    const status = result.status;
+                    const prime = result.card.prime;
+                    // console.log(status)
+                    // console.log(prime)
+
+                    const trip = {
+                        attraction: attractionData,
+                    };
+
+                    const contact = {
+                        name: contactName,
+                        email: contactEmail,
+                        phone: contactPhone,
+                    };
+
+                    const order = {
+                        price: price,
+                        trip: trip,
+                        date: date,
+                        time: time,
+                        contact: contact,
+                    };
+                    // console.log(order);
+
+                    const newOrderData = {
+                        prime : prime,
+                        order : order,
+                    };
+                    console.log(newOrderData);
+                    
+                    alert('get prime 成功，prime: ' + prime);
+                    createNewOrder(newOrderData);
+                });
+
+            } catch (error) {
+                console.error("訂購失敗:", error);
             }
 
-            TPDirect.card.getPrime(function (result) {
-                if (result.status !== 0) {
-                    alert('get prime error ' + result.msg);
-                    return;
-                }
-                alert('get prime 成功，prime: ' + result.card.prime);
-            });
+            
         });
+
+        async function createNewOrder(newOrderData) {
+            try {
+                let token = localStorage.getItem("access_token");
+                const response = await fetch("/api/orders", {
+                    method: "POST",
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(newOrderData),
+                });
+
+                if (response.ok) {
+                    window.location.href = '/thankyou';
+                } else {
+                    alert('訂購失敗，請重新訂購');
+                };
+
+            } catch (error) {
+                console.error("訂購失敗:", error);
+            }
+        }
 
         function setNumberFormGroupToError(selector) {
             const element = document.querySelector(selector);
