@@ -229,7 +229,7 @@ def getBookingData():
 
 		# 查詢資料庫
 		mycursor = mydb.cursor(dictionary=True)
-		sql = 'SELECT * FROM orders WHERE memberId = %s'
+		sql = 'SELECT * FROM orders WHERE memberId = %s AND orderNumber IS NULL'
 		mycursor.execute(sql, (memberId,))
 		hadBooking = mycursor.fetchall()
 
@@ -299,24 +299,25 @@ def createBooking():
 		date = request.json.get('date')
 		time = request.json.get('time')
 		price = request.json.get('price')
+		status_notPaid = 1
 	
 		if member:
 			try:
 				memberId = member['id']
-				sql = 'SELECT * FROM orders WHERE memberId = %s'
+				sql = 'SELECT * FROM orders WHERE memberId = %s AND orderNumber IS NULL'
 				mycursor.execute(sql, (memberId,))
-				bookedBefore = mycursor.fetchone()
+				bookedBefore = mycursor.fetchall()
 
 				if bookedBefore:
-					sql = 'UPDATE orders SET attractionId = %s, date = %s, time = %s, price = %s WHERE memberId = %s'
-					val = (attractionId, date, time, price, memberId)
+					sql = 'UPDATE orders SET attractionId = %s, date = %s, time = %s, price = %s, status = %s WHERE memberId = %s'
+					val = (attractionId, date, time, price, status_notPaid, memberId)
 					mycursor.execute(sql, val)
 					mydb.commit()
 					data = {'ok': True}
 					return jsonify(data), 200
 				else:
-					sql = 'INSERT INTO orders(memberId, attractionId, date, time, price) VALUES(%s, %s, %s, %s, %s)'
-					val = (memberId, attractionId, date, time, price)
+					sql = 'INSERT INTO orders(memberId, attractionId, date, time, price, status) VALUES(%s, %s, %s, %s, %s, %s)'
+					val = (memberId, attractionId, date, time, price, status_notPaid)
 					mycursor.execute(sql, val)
 					mydb.commit()
 					data = {'ok': True}
@@ -352,7 +353,7 @@ def deleteBookingData():
 		if member:
 			try:
 				memberId = member['id']
-				sql = 'DELETE FROM orders WHERE memberId = %s'
+				sql = 'DELETE FROM orders WHERE memberId = %s AND orderNumber IS NULL'
 				mycursor.execute(sql, (memberId,))
 				mydb.commit()
 				data = {'ok': True}
@@ -381,21 +382,103 @@ def createNewOrder():
 		member = current_member
 		memberId = member['id']
 		newOrderData = request.get_json()
+		attractionName = newOrderData['order']['trip']['attraction']['name']
+		attractionAddress = newOrderData['order']['trip']['attraction']['address']
+		attractionImg = newOrderData['order']['trip']['attraction']['image']
+		contactName = newOrderData['order']['contact']['name']
+		contactEmail = newOrderData['order']['contact']['email']
+		contactPhone = newOrderData['order']['contact']['phone']
+		# print(contactName)
+		# print(contactEmail)
+		# print(contactPhone)
 		result = verify_payment(newOrderData)
 		orderNumber = result['order_number']
-		print(orderNumber)
+		status = result['status']
+		msg = result['msg']
+		print(status)
+		# status_notPaid = 1
+		# print(memberId)
+		# print(orderNumber)
 		# print(result)
 
 		if result['status'] == 0:
-			sql = 'UPDATE orders SET orderNumber = %s WHERE memberId = %s'
-			val = (orderNumber, memberId)
+			sql = 'UPDATE orders SET orderNumber = %s, status = %s, attractionName = %s, attractionAddress = %s, attractionImg = %s, contactName = %s, contactEmail = %s, contactPhone = %s WHERE memberId = %s AND orderNumber IS NULL'
+			val = (orderNumber, status, attractionName, attractionAddress, attractionImg, contactName, contactEmail, contactPhone, memberId)
 			mycursor.execute(sql, val)
 			mydb.commit()
 			response_data = {
 				"number" : orderNumber,
 				"payment" : {
-					"status" : 0,
+					"status" : status,
 					"message" : "付款成功"
+				}
+			}
+			data = {
+				"data" : response_data,
+			}
+			return jsonify(data), 200
+		
+		elif result['status'] == 734:
+			sql = 'UPDATE orders SET orderNumber = %s, status = %s, contactName = %s, contactEmail = %s, contactPhone = %s WHERE memberId = %s AND orderNumber IS NULL'
+			val = (orderNumber, status, contactName, contactEmail, contactPhone, memberId)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			response_data = {
+				"number" : orderNumber,
+				"payment" : {
+					"status" : status,
+					"message" : msg
+				}
+			}
+			data = {
+				"data" : response_data,
+			}
+			return jsonify(data), 200
+		
+		elif result['status'] == 84:
+			sql = 'UPDATE orders SET orderNumber = %s, status = %s, contactName = %s, contactEmail = %s, contactPhone = %s WHERE memberId = %s AND orderNumber IS NULL'
+			val = (orderNumber, status, contactName, contactEmail, contactPhone, memberId)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			response_data = {
+				"number" : orderNumber,
+				"payment" : {
+					"status" : status,
+					"message" : msg
+				}
+			}
+			data = {
+				"data" : response_data,
+			}
+			return jsonify(data), 200
+		
+		elif result['status'] == 91:
+			sql = 'UPDATE orders SET orderNumber = %s, status = %s, contactName = %s, contactEmail = %s, contactPhone = %s WHERE memberId = %s AND orderNumber IS NULL'
+			val = (orderNumber, status, contactName, contactEmail, contactPhone, memberId)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			response_data = {
+				"number" : orderNumber,
+				"payment" : {
+					"status" : status,
+					"message" : msg
+				}
+			}
+			data = {
+				"data" : response_data,
+			}
+			return jsonify(data), 200
+		
+		elif result['status'] == 10039:
+			sql = 'UPDATE orders SET orderNumber = %s, status = %s, contactName = %s, contactEmail = %s, contactPhone = %s WHERE memberId = %s AND orderNumber IS NULL'
+			val = (orderNumber, status, contactName, contactEmail, contactPhone, memberId)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			response_data = {
+				"number" : orderNumber,
+				"payment" : {
+					"status" : status,
+					"message" : msg
 				}
 			}
 			data = {
@@ -408,7 +491,7 @@ def createNewOrder():
 				"error": True,
   				"message": "訂單建立失敗"
 			}
-			return jsonify(data), 200
+			return jsonify(data), 400
 
 	except Exception as e:
 		data = {
@@ -417,35 +500,82 @@ def createNewOrder():
 		}
 		return jsonify(data), 500
 
-@app.route('/api/orders/<int:orderNumber>', methods=['GET'])
-@jwt_required()
-def getOrderData():
+@app.route('/api/order/<int:orderNumber>', methods=['GET'])
+# @jwt_required()
+def getOrderData(orderNumber):
 	try:
-		current_member = get_jwt_identity()
-		member = current_member
-		memberId = member['id']
+		print(orderNumber)
+		# current_member = get_jwt_identity()
+		# member = current_member
+		# memberId = member['id']
+		# orderNumber = request.args.get('number')
 		mycursor = mydb.cursor(dictionary=True)
-		sql = 'SELECT * FROM orders WHERE memberId = %s'
-		val = ()
-		mycursor.execute(sql, val)
+		sql = 'SELECT * FROM orders WHERE orderNumber = %s'
+		# val = (orderNumber)
+		mycursor.execute(sql, (orderNumber,))
 		searchResult = mycursor.fetchone()
+		# print(searchResult)
 
-		# attractionId 錯誤
-		if not searchResult:
-			return jsonify({"error": True, "message": "景點編號不正確"}), 400
-
-		# 使用 json.loads() 將 images 字串轉成 list
-		searchResult['images'] = json.loads(searchResult['images'])
-
-		data = {
-			"data":searchResult
-		}
-
+		# 找到訂單
 		if searchResult:
-			return jsonify(data)
+			# 處理 price 格式
+			price_float = searchResult['price']
+			# 將浮點數轉換為整數後，再轉為字串
+			price_int = int(price_float)
+			formatted_price = str(price_int)
+
+			# 處理 phone 格式
+			# 將數字轉換為字串，再判斷長度
+			phone_number = searchResult['contactPhone']
+			phone_str = str(phone_number)
+			if len(phone_str) == 9:
+    			# 在字串前面加上 "0" 以達到 10 個數字的格式
+				formatted_phone = "0" + phone_str
+			else:
+				formatted_phone = phone_str
+
+			attraction = {
+				"id" : searchResult['id'],
+				"name" : searchResult['attractionName'],
+				"address" : searchResult['attractionAddress'],
+				"image" : searchResult['attractionImg']
+			}
+			# print(attraction)
+
+			trip = {
+				"attraction" : attraction,
+				"date" : searchResult['date'],
+				"time" : searchResult['time']
+			}
+
+			contact = {
+				"name" : searchResult['contactName'],
+				"email" : searchResult['contactEmail'],
+				"phone" : formatted_phone
+			}
+
+			datas = {
+				"number" : searchResult['orderNumber'],
+				"price" : formatted_price,
+				"trip" : trip,
+				"contact" : contact,
+				"status" : searchResult['status']
+			}
+
+			data = {
+				"data" : datas
+			}
+			return jsonify(data), 200
+
+		else:
+			data = {
+				"data" : None
+			}
+			return jsonify(data), 200
 		
 	except Exception as e:
 		return jsonify({"error": True, "message": "伺服器內部錯誤"}), 500
+	
 
 def verify_payment(newOrderData):
 	# 設置訂單編號
@@ -469,7 +599,7 @@ def verify_payment(newOrderData):
     # 構建請求主體
 	payload = {
         "partner_key": partner_key,
-        "prime": prime,
+        "prime": newOrderData['prime'],
         "amount": newOrderData['order']['price'],
         "merchant_id": merchant_id,
         "details": newOrderData['order']['trip']['attraction']['name'],
@@ -492,6 +622,7 @@ def verify_payment(newOrderData):
 
     # 獲取API的回應
 	api_response = response.json()
+	print(api_response.get('status'))
 
     # 根據API回應做相應處理
 	if api_response.get('status') == 0:
@@ -499,15 +630,61 @@ def verify_payment(newOrderData):
 		print('付款驗證成功')
 		print(api_response)
 		data = {
-			"status" : 0,
-			"order_number" : api_response.get('order_number')
+			"status" : api_response.get('status'),
+			"order_number" : api_response.get('order_number'),
+			"msg" :  api_response.get('msg')
 		}
 		return data
-	else:
+	
+	elif api_response.get('status') == 734:
         # 付款驗證失敗
 		print('付款驗證失敗')
 		print(api_response)
-        # return jsonify({"message": "Payment verification failed"})
-
+		data = {
+			"status" : api_response.get('status'),
+			"order_number" : api_response.get('order_number'),
+			"msg" :  api_response.get('msg')
+		}
+		return data
+	
+	elif api_response.get('status') == 84:
+		print('付款驗證失敗')
+		print(api_response)
+		data = {
+			"status" : api_response.get('status'),
+			"order_number" : api_response.get('order_number'),
+			"msg" :  api_response.get('msg')
+		}
+		return data
+	
+	elif api_response.get('status') == 91:
+		print('付款驗證失敗')
+		print(api_response)
+		data = {
+			"status" : api_response.get('status'),
+			"order_number" : api_response.get('order_number'),
+			"msg" :  api_response.get('msg')
+		}
+		return data
+	
+	elif api_response.get('status') == 10039:
+		print('付款驗證失敗')
+		print(api_response)
+		data = {
+			"status" : api_response.get('status'),
+			"order_number" : api_response.get('order_number'),
+			"msg" :  api_response.get('msg')
+		}
+		return data
+	
+	else:
+		print('付款驗證失敗')
+		print(api_response)
+		data = {
+			"status" : api_response.get('status'),
+			"order_number" : api_response.get('order_number'),
+			"msg" :  api_response.get('msg')
+		}
+		return data
 
 app.run(host="0.0.0.0", debug=True, port=3000)

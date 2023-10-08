@@ -742,6 +742,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: none;
 }
 
+#contactInfo{
+    margin-top: 40px;
+    padding: 0px 10px;
+    display: none;
+}
+
+#paymentStatus{
+    margin-top: 20px;
+    padding: 0px 10px;
+    display: none;
+}
+
 .bookingSection{
     width: 100%;
     display: flex;
@@ -889,6 +901,36 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+.mb15{
+    margin-bottom: 15px;
+}
+
+/* .paymentStatus{
+    width: 110px;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    background-color: #448899;
+    color: #ffffff;
+    font-size: 19px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+
+.contactSection{
+    width: 100%;
+    display: flex;
+}
+
+#thxText{
+    display: none;
+}
+
+#pay_status{
+    margin-top: 20px;
 }
 
 
@@ -1103,6 +1145,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     .bookingSection{
         flex-direction: column;
         position: relative;
+        margin-top: 0;
     }
 
     .bookingPic {
@@ -1127,6 +1170,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
     .confirm {
         padding-right: 10px;
+    }
+
+    .paymentStatus{
+        width: 90px;
+        height: 35px;
+        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 0 0 10px;
+    }
+
+    #contactInfo{
+        margin-top: 20px;
     }
 
     

@@ -28,19 +28,18 @@
 
     <!-- 1000px Main Content-->
     <div class="container" id="bookingContainer">
-        <div class="haedline">
-            Hello ~ <span id="memberName"> Wennie </span>
-            ，訂購已完成！
+        <div class="haedline mb15">
+            Hello ~ <span id="memberName"> Wennie，</span>
+            <span id="thxText">訂購已完成！訂購明細如下：</span>
         </div>
 
 
         <!-- yes 有預訂行程時 -->
         <div id="hadBooking">
             <div class="bookingSection">
-                <div class="bookingPic"><img src=""></div>
                 <div class="bookigInfo">
                     <div class="bookingName">
-                        台北一日遊：
+                        台北一日遊 -
                         <span id="attractionName">平安鐘</span>
                     </div>
                     <div class="allInfos">
@@ -62,14 +61,48 @@
                         </div>
                     </div>
                 </div>
-                <img src="/icon_delete.png" alt="刪除預訂行程" class="icon_delete">
             </div>
+        </div>
 
+        <div id="contactInfo">
+            <div class="contactSection">
+                <div class="bookigInfo">
+                    <div class="bookingName">
+                        聯絡資訊 -
+                    </div>
+                    <div class="allInfos">
+                        <div class="F16-700 C666666">
+                            聯絡人姓名：
+                            <span id="contactName" class="F16-500 C666666"></span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            聯絡人電話：
+                            <span id="contactPhone" class="F16-500 C666666"></span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            聯絡人 email：
+                            <span id="contactEmail" class="F16-500 C666666"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="paymentStatus">
+            <div class="bookingSection">
+                <div class="bookigInfo">
+                    <div class="bookingName">
+                        付款狀態 -
+                        <div id="pay_status" class="F16-700 C666666"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- no 沒預訂行程時 -->
         <div class="F16-500 C666666" id="noBooking">
-            目前沒有任何待預訂的行程
+            目前沒有任何已訂購的行程
+            <!-- <div>立即前往訂購</div> -->
         </div>
 
     </div>
@@ -117,146 +150,115 @@
     </footer>
 
     <script src="/login.js"></script>
-</body>
-<script>
-    const PROD_API_PATH = "http://13.238.60.107:3000";
-    const DEV_API_PATH = "http://127.0.0.1:3000";
-
-    // 標題回首頁
-    const header = document.querySelector('.header');
-    const footer = document.querySelector('footer');
-    const deleteBtn = document.querySelector('.icon_delete');
-
-    deleteBtn.addEventListener('click', async function () {
-       try {
-        let token = localStorage.getItem("access_token");
-            const response = await fetch("/api/booking", {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const data = await response.json();
-
-            if(data.ok){
-                alert("預訂行程已刪除")
-                window.location.reload();
+    <script>
+        const PROD_API_PATH = "http://13.238.60.107:3000";
+        const DEV_API_PATH = "http://127.0.0.1:3000";
+    
+        // 標題回首頁
+        const header = document.querySelector('.header');
+        const footer = document.querySelector('footer');
+        header.addEventListener('click', function () {
+            window.location.href = '/';
+        });
+    
+        ////
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                if (await verifyToken()) {
+                    await getThankyouData();
+                } else {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('An error occurred:', error);
             }
-       } catch (error) {
-            console.error("失敗:", error);
-       }
-    });
-
-
-    header.addEventListener('click', function () {
-        window.location.href = '/';
-    });
-
-    document.addEventListener("DOMContentLoaded", async function () {
-        try {
-            if (await verifyToken()) {
-                await getOrderData();
-            } else {
-                window.location.href = '/';
-            }
-        } catch (error) {
-            console.error('An error occurred:', error);
-        }
-    });
-
-    // call api : /api/booking 'GET'
-    async function getOrderData() {
-        try {
-            let token = localStorage.getItem("access_token");
-            const response = await fetch("/api/booking", {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const response_data = await response.json();
-            const data = response_data.data;
-            const userName = userData.name;
-
-            if (response.status === 200 && data !== null) {
-                const arratctionDatas = data.attraction;
-                const hadBooking = document.getElementById('hadBooking');
-                const noBooking = document.getElementById('noBooking');
-                const memberName = document.getElementById('memberName');
-                const bookingPic = document.querySelector('.bookingPic');
-                const attractionName = document.getElementById('attractionName');
-                const ordersDate = document.getElementById('ordersDate');
-                const ordersTime = document.getElementById('ordersTime');
-                const ordersPrice = document.querySelectorAll('.ordersPrice');
-                const attractionAddress = document.getElementById('attractionAddress');
-                noBooking.style.display = "none"
-                hadBooking.style.display = "block";
-                // 有資料時 footer 不用那麼高
-                footer.classList.remove('footer-100vh');
-
-                const date = data.date;
-                const time = data.time;
-                const name = arratctionDatas.name;
-                const address = arratctionDatas.address;
-
-                // 替換 user name
-                memberName.textContent = userName;
-
-                attractionName.textContent = name;
-                attractionAddress.textContent = address;
-
-                // 替換圖片
-                const pic = arratctionDatas.image;
-                const newImage = document.createElement('img');
-                newImage.src = pic;
-                bookingPic.innerHTML = '';
-                bookingPic.appendChild(newImage)
-
-                // 替換日期
-                const newDate = new Date(date);
-                // 取得年、月、日
-                const year = newDate.getFullYear();
-                const month = String(newDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始的，所以要加 1
-                const day = String(newDate.getDate()).padStart(2, '0');
-
-                // 重新設定日期顯示內容
-                ordersDate.textContent = `${year}-${month}-${day}`;
-
-                // 替換價格
-                const priceNumber = data.price;
-                const price = `新台幣 ${priceNumber} 元`;
-                // 使用 toLocaleString 去除逗號＆確保小數為 0
-                const formattedPrice = priceNumber.toLocaleString('en-US', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2, // 將 maximumFractionDigits 設為 2
-                }).replace('.00', ''); // 移除小數部分
-                ordersPrice.forEach((element) => {
-                    element.innerHTML = `新台幣 ${formattedPrice} 元`;
+        });
+    
+        // call api : /api/booking 'GET'
+        async function getThankyouData() {
+            try {
+                let token = localStorage.getItem("access_token");
+                // 獲取現在網址的 query string
+                const currentUrl = window.location.href;
+                // 用 array 把 query 裝起來
+                const searchParams = new URLSearchParams(currentUrl.split('?')[1]);
+                // 從 query string 中獲取 orderNumber 參數的值
+                const orderNumber = searchParams.get('number');
+                console.log(orderNumber);
+    
+                const response = await fetch(`/api/order/${orderNumber}`, {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
-
-                // 替換 time
-                if (time === "morning") {
-                    ordersTime.textContent = "早上 9 點到下午 4 點";
-                } else if (time === "afternoon") {
-                    ordersTime.textContent = "下午 2 點到晚上 9 點";
-                };
-            } else if (response.status === 200 && data == null) {
-                hadBooking.style.display = "none";
-                noBooking.style.display = "block";
-                const memberName = document.getElementById('memberName');
-                // 替換 user name
-                memberName.textContent = userName;
-                // 沒資料時 footer vh 要變成 100%
-                footer.classList.add('footer-100vh');
+    
+                const response_data = await response.json();
+                const data = response_data.data;
+                console.log(data)
+                // const userName = userData.name;
+    
+                if (response.status === 200 && data !== null) {
+                    const hadBooking = document.getElementById('hadBooking');
+                    const attractionName = document.getElementById('attractionName');
+                    const ordersDate = document.getElementById('ordersDate');
+                    const ordersTime = document.getElementById('ordersTime');
+                    const time = data.trip.time;
+                    const ordersPrice = document.querySelector('.ordersPrice');
+                    const priceNumber = data.price;
+                    const price = `新台幣 ${priceNumber} 元`;
+                    const attractionAddress = document.getElementById('attractionAddress');
+                    const contactNameEle = document.getElementById('contactName');
+                    const contactPhoneEle = document.getElementById('contactPhone');
+                    const contactEmailEle = document.getElementById('contactEmail');
+                    const contactInfo = document.getElementById('contactInfo');
+                    const thxHr = document.getElementById('thxHr');
+                    const thxText = document.getElementById('thxText');
+                    const paymentStatus = document.getElementById('paymentStatus');
+                    const pay_status = document.getElementById('pay_status');
+    
+                    // 訂購的景點資訊
+                    thxText.style.display = "inline"
+                    hadBooking.style.display = "flex";
+                    contactInfo.style.display = "block";
+                    paymentStatus.style.display = "block";
+                    noBooking.style.display = "none";
+                    attractionName.textContent = data.trip.attraction.name;
+                    ordersDate.textContent = data.trip.date;
+                    ordersPrice.textContent = price;
+                    attractionAddress.textContent = data.trip.attraction.address;
+                    if (time === "morning") {
+                        ordersTime.textContent = "早上 9 點到下午 4 點";
+                    } else if (time === "afternoon") {
+                        ordersTime.textContent = "下午 2 點到晚上 9 點";
+                    };
+    
+                    // 訂購的聯絡資訊
+                    contactNameEle.textContent = data.contact.name;
+                    contactPhoneEle.textContent = data.contact.phone;
+                    contactEmailEle.textContent = data.contact.email;
+                    
+                    // 訂單狀態
+                    pay_status.textContent = "已付款"
+    
+                    // 有資料時 footer 不用那麼高
+                    footer.classList.remove('footer-100vh');
+                    console.log("OK")
+    
+                } else if (response.status === 200 && data == null){
+                    thxText.style.display = "none"
+                    hadBooking.style.display = "none";
+                    contactInfo.style.display = "none";
+                    noBooking.style.display = "block";
+                    // 沒資料時 footer vh 要變成 100%
+                    footer.classList.add('footer-100vh');
+                }
+            } catch (error) {
+                console.error("失敗:", error);
             }
-        } catch (error) {
-            console.error("失敗:", error);
         }
-    }
-
-</script>
+    </script>
+</body>
 
 </html>

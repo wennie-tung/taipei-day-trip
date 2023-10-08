@@ -175,6 +175,8 @@
         const deleteBtn = document.querySelector('.icon_delete');
         let data;
         let formattedPrice;
+        let hadBooking;
+        let noBooking;
         // let newOrderData;
 
         // 標題回首頁
@@ -214,8 +216,8 @@
 
                 if (response.status === 200 && data !== null) {
                     const arratctionDatas = data.attraction;
-                    const hadBooking = document.getElementById('hadBooking');
-                    const noBooking = document.getElementById('noBooking');
+                    hadBooking = document.getElementById('hadBooking');
+                    noBooking = document.getElementById('noBooking');
                     const memberName = document.getElementById('memberName');
                     const bookingPic = document.querySelector('.bookingPic');
                     const attractionName = document.getElementById('attractionName');
@@ -246,15 +248,16 @@
                     bookingPic.innerHTML = '';
                     bookingPic.appendChild(newImage)
 
-                    // 替換日期
-                    const newDate = new Date(date);
-                    // 取得年、月、日
-                    const year = newDate.getFullYear();
-                    const month = String(newDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始的，所以要加 1
-                    const day = String(newDate.getDate()).padStart(2, '0');
+                    // // 替換日期
+                    // const newDate = new Date(date);
+                    // // 取得年、月、日
+                    // const year = newDate.getFullYear();
+                    // const month = String(newDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始的，所以要加 1
+                    // const day = String(newDate.getDate()).padStart(2, '0');
 
                     // 重新設定日期顯示內容
-                    ordersDate.textContent = `${year}-${month}-${day}`;
+                    // ordersDate.textContent = `${year}-${month}-${day}`;
+                    ordersDate.textContent = date;
 
                     // 替換價格
                     const priceNumber = data.price;
@@ -311,7 +314,7 @@
             } catch (error) {
                 console.error("失敗:", error);
             }
-        });
+        }); 
     </script>
     <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.17.0"></script>
     <script>
@@ -390,12 +393,12 @@
                 forceBlurIos();
                 const tappayStatus = TPDirect.card.getTappayFieldsStatus();
                 if (!tappayStatus.canGetPrime) {
-                alert('can not get prime');
+                // alert('can not get prime');
                 return;
                 }
                 TPDirect.card.getPrime(function (result) {
                     if (result.status !== 0) {
-                        alert('get prime error ' + result.msg);
+                        // alert('get prime error ' + result.msg);
                         return;
                     }
 
@@ -436,10 +439,15 @@
                         prime : prime,
                         order : order,
                     };
-                    console.log(newOrderData);
+                    // console.log(newOrderData);
                     
-                    alert('get prime 成功，prime: ' + prime);
+                    // alert('get prime 成功，prime: ' + prime);
                     createNewOrder(newOrderData);
+                    hadBooking.style.display = "none";
+                    noBooking.style.display = "block";
+                    // 沒資料時 footer vh 要變成 100%
+                    footer.classList.add('footer-100vh');
+
                 });
 
             } catch (error) {
@@ -463,7 +471,11 @@
                 });
 
                 if (response.ok) {
-                    window.location.href = '/thankyou';
+                    const data = await response.json();
+                    // console.log(data);
+                    const orderNumber = data.data.number;
+                    // console.log(orderNumber);
+                    window.location.href = '/thankyou?number=' + orderNumber;
                 } else {
                     alert('訂購失敗，請重新訂購');
                 };
