@@ -128,14 +128,14 @@
     // fetch 取得捷運站 API 資料 
     // 使用 async, await 處理異步程式碼
     async function getMrtsData() {
-        const response = await fetch(`${DEV_API_PATH}/api/mrts`);
+        const response = await fetch(`${PROD_API_PATH}/api/mrts`);
         const data = await response.json();
         return data.data;
     };
 
     // fetch 取得 attractions API 資料 
     async function getAttractionsData(page, keyword) {
-        const response = await fetch(`${DEV_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
+        const response = await fetch(`${PROD_API_PATH}/api/attractions?page=${page}&keyword=${keyword}`);
         const data = await response.json();
         const dataData = data.data;
         // 先把 API 回傳的 nextPage 存起來

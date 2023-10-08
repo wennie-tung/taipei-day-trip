@@ -14,7 +14,7 @@ jwt = JWTManager(app)
 # 連接到本機的 MySQL
 mydb = mysql.connector.connect(
     host="localhost",
-    user="root",
+    user="wennie",
     password="password",
     database="websiteTT"
 )
