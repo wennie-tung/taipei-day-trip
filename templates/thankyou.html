@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wennie Tung">
+    <title>Taipei Trip 台北一日遊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <!-- navigation -->
+    <div class="navigationFrame">
+        <div class="navigationBar">
+            <div class="header">台北一日遊</div>
+            <div class="list">
+                <div id="goToBooking">預定行程</div>
+                <div id="signIn">登入/註冊</div>
+                <div id="signOut">登出系統</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1000px Main Content-->
+    <div class="container" id="bookingContainer">
+        <div class="haedline mb15">
+            Hello ~ <span id="memberName"> Wennie，</span>
+            <span id="thxText">訂購已完成！訂購明細如下：</span>
+        </div>
+
+
+        <!-- yes 有預訂行程時 -->
+        <div id="hadBooking">
+            <div class="bookingSection">
+                <div class="bookigInfo">
+                    <div class="bookingName">
+                        台北一日遊 -
+                        <span id="attractionName">平安鐘</span>
+                    </div>
+                    <div class="allInfos">
+                        <div class="F16-700 C666666">
+                            日期：
+                            <span id="ordersDate" class="F16-500 C666666">2021-04-23</span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            時間：
+                            <span id="ordersTime" class="F16-500 C666666">早上 9 點到下午 4 點</span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            費用：
+                            <span class="F16-500 C666666 ordersPrice">新台幣 2000 元</span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            地點：
+                            <span id="attractionAddress" class="F16-500 C666666">臺北市 大安區忠孝東路4段</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="contactInfo">
+            <div class="contactSection">
+                <div class="bookigInfo">
+                    <div class="bookingName">
+                        聯絡資訊 -
+                    </div>
+                    <div class="allInfos">
+                        <div class="F16-700 C666666">
+                            聯絡人姓名：
+                            <span id="contactName" class="F16-500 C666666"></span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            聯絡人電話：
+                            <span id="contactPhone" class="F16-500 C666666"></span>
+                        </div>
+                        <div class="F16-700 C666666">
+                            聯絡人 email：
+                            <span id="contactEmail" class="F16-500 C666666"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="paymentStatus">
+            <div class="bookingSection">
+                <div class="bookigInfo">
+                    <div class="bookingName">
+                        付款狀態 -
+                        <div id="pay_status" class="F16-700 C666666"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- no 沒預訂行程時 -->
+        <div class="F16-500 C666666" id="noBooking">
+            目前沒有任何已訂購的行程
+            <!-- <div>立即前往訂購</div> -->
+        </div>
+
+    </div>
+
+    <!-- sign in box -->
+    <div class="signInBoxContainer">
+        <div class="signInBox">
+            <div class="decoratorBar"></div>
+            <form class="signInForm" id="signInForm">
+                <div class="signInTextContainer">
+                    <div class="signInTitle">登入會員帳號</div>
+                    <img src="/icon_close.png" alt="icon_close" class="closeIcon" id="closeSignIn">
+                    <input type="email" name="signInAccount" placeholder="輸入電子信箱" class="accountInput">
+                    <input type="password" name="signInPassword" placeholder="輸入密碼" class="accountInput">
+                    <button type="button" id="signInButton">登入帳戶</button>
+                    <div class="signInMsg"></div>
+                    <div class="goToSignUp">還沒有帳戶？點此註冊</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- sign up box -->
+    <div class="signUpBoxContainer">
+        <div class="signUpBox">
+            <div class="decoratorBar"></div>
+            <form class="signInForm" id="signUpForm">
+                <div class="signInTextContainer">
+                    <div class="signInTitle">註冊會員帳號</div>
+                    <img src="/icon_close.png" alt="icon_close" class="closeIcon" id="closeSignUp">
+                    <input type="text" name="signUpName" placeholder="輸入姓名" class="accountInput">
+                    <input type="email" name="signUpAccount" placeholder="輸入電子郵件" class="accountInput">
+                    <input type="password" name="signUpPassword" placeholder="輸入密碼" class="accountInput">
+                    <button type="button" id="signUpButton">註冊新帳戶</button>
+                    <div class="signUpMsg"></div>
+                    <div class="goToSignIn">已經有帳戶了？點此登入</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <div class="footerText">COPYRIGHT © 2021 台北一日遊</div>
+    </footer>
+
+    <script src="/login.js"></script>
+    <script>
+        const PROD_API_PATH = "http://13.238.60.107:3000";
+        const DEV_API_PATH = "http://127.0.0.1:3000";
+    
+        // 標題回首頁
+        const header = document.querySelector('.header');
+        const footer = document.querySelector('footer');
+        header.addEventListener('click', function () {
+            window.location.href = '/';
+        });
+    
+        ////
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                if (await verifyToken()) {
+                    await getThankyouData();
+                } else {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    
+        // call api : /api/booking 'GET'
+        async function getThankyouData() {
+            try {
+                let token = localStorage.getItem("access_token");
+                // 獲取現在網址的 query string
+                const currentUrl = window.location.href;
+                // 用 array 把 query 裝起來
+                const searchParams = new URLSearchParams(currentUrl.split('?')[1]);
+                // 從 query string 中獲取 orderNumber 參數的值
+                const orderNumber = searchParams.get('number');
+                console.log(orderNumber);
+    
+                const response = await fetch(`/api/order/${orderNumber}`, {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+    
+                const response_data = await response.json();
+                const data = response_data.data;
+                console.log(data)
+                // const userName = userData.name;
+    
+                if (response.status === 200 && data !== null) {
+                    const hadBooking = document.getElementById('hadBooking');
+                    const attractionName = document.getElementById('attractionName');
+                    const ordersDate = document.getElementById('ordersDate');
+                    const ordersTime = document.getElementById('ordersTime');
+                    const time = data.trip.time;
+                    const ordersPrice = document.querySelector('.ordersPrice');
+                    const priceNumber = data.price;
+                    const price = `新台幣 ${priceNumber} 元`;
+                    const attractionAddress = document.getElementById('attractionAddress');
+                    const contactNameEle = document.getElementById('contactName');
+                    const contactPhoneEle = document.getElementById('contactPhone');
+                    const contactEmailEle = document.getElementById('contactEmail');
+                    const contactInfo = document.getElementById('contactInfo');
+                    const thxHr = document.getElementById('thxHr');
+                    const thxText = document.getElementById('thxText');
+                    const paymentStatus = document.getElementById('paymentStatus');
+                    const pay_status = document.getElementById('pay_status');
+    
+                    // 訂購的景點資訊
+                    thxText.style.display = "inline"
+                    hadBooking.style.display = "flex";
+                    contactInfo.style.display = "block";
+                    paymentStatus.style.display = "block";
+                    noBooking.style.display = "none";
+                    attractionName.textContent = data.trip.attraction.name;
+                    ordersDate.textContent = data.trip.date;
+                    ordersPrice.textContent = price;
+                    attractionAddress.textContent = data.trip.attraction.address;
+                    if (time === "morning") {
+                        ordersTime.textContent = "早上 9 點到下午 4 點";
+                    } else if (time === "afternoon") {
+                        ordersTime.textContent = "下午 2 點到晚上 9 點";
+                    };
+    
+                    // 訂購的聯絡資訊
+                    contactNameEle.textContent = data.contact.name;
+                    contactPhoneEle.textContent = data.contact.phone;
+                    contactEmailEle.textContent = data.contact.email;
+                    
+                    // 訂單狀態
+                    pay_status.textContent = "已付款"
+    
+                    // 有資料時 footer 不用那麼高
+                    footer.classList.remove('footer-100vh');
+                    console.log("OK")
+    
+                } else if (response.status === 200 && data == null){
+                    thxText.style.display = "none"
+                    hadBooking.style.display = "none";
+                    contactInfo.style.display = "none";
+                    noBooking.style.display = "block";
+                    // 沒資料時 footer vh 要變成 100%
+                    footer.classList.add('footer-100vh');
+                }
+            } catch (error) {
+                console.error("失敗:", error);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -35,7 +35,7 @@
         <!-- yes 有預訂行程時 -->
         <div id="hadBooking">
             <div class="bookingSection">
-                <div class="bookingPic"><img src="/logan.jpg"></div>
+                <div class="bookingPic"><img src=""></div>
                 <div class="bookigInfo">
                     <div class="bookingName">
                         台北一日遊：
@@ -70,15 +70,15 @@
                 <div class="F19-700 C666666">您的聯絡資訊</div>
                 <div>
                     <label class="F16-500 C666666">聯絡姓名：</label>
-                    <input type="text">
+                    <input type="text" id="contactName">
                 </div>
                 <div>
                     <label class="F16-500 C666666">聯絡信箱：</label>
-                    <input type="email">
+                    <input type="email" id="contactEmail">
                 </div>
                 <div>
                     <label class="F16-500 C666666">手機號碼：</label>
-                    <input type="tel">
+                    <input type="tel" id="contactPhone">
                 </div>
                 <div class="F16-700 C666666">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
             </form>
@@ -88,19 +88,22 @@
             <!-- payment form -->
             <form id="paymentForm">
                 <div class="F19-700 C666666">信用卡付款資訊</div>
-                <div>
-                    <label class="F16-500 C666666">卡片號碼：</label>
-                    <input type="password" placeholder="**** **** **** ****">
+                <div class="form-group card-number-group">
+                    <label for="card-number" class="F16-500 C666666"><span id="cardtype"></span>卡片號碼：</label>
+                    <div class="paymentFormInput" id="card-number"></div>
+                    <!-- <div class="form-control card-number"></div> -->
                 </div>
-                <div>
-                    <label class="F16-500 C666666">過期時間：</label>
-                    <input type="number" placeholder="MM / YY">
+                <div class="form-group expiration-date-group">
+                    <label for="expiration-date" class="F16-500 C666666">過期時間：</label>
+                    <div class="paymentFormInput" id="tappay-expiration-date"></div>
+                    <!-- <div class="form-control expiration-date" id="tappay-expiration-date"></div> -->
                 </div>
-                <div>
-                    <label class="F16-500 C666666">驗證密碼：</label>
-                    <input type="text" placeholder="CVV">
+                <div class="form-group ccv-group">
+                    <label for="ccv" class="F16-500 C666666">驗證密碼：</label>
+                    <div class="paymentFormInput" id="card-ccv"></div>
+                    <!-- <div class="form-control ccv"></div> -->
                 </div>
-            </form>
+            </form> 
 
             <hr />
 
@@ -109,7 +112,7 @@
                     總價：
                     <span class="ordersPrice F16-700 C666666">新台幣 2000 元</span>
                 </div>
-                <button>確認訂購並付款</button>
+                <button id="confirmBookingBtn">確認訂購並付款</button>
             </div>
         </div>
 
@@ -163,146 +166,360 @@
     </footer>
 
     <script src="/login.js"></script>
-</body>
-<script>
-    const PROD_API_PATH = "http://13.238.60.107:3000";
-    const DEV_API_PATH = "http://127.0.0.1:3000";
+    <script>
+        const PROD_API_PATH = "http://13.238.60.107:3000";
+        const DEV_API_PATH = "http://127.0.0.1:3000";
+        const confirmBookingBtn = document.getElementById('confirmBookingBtn');
+        const header = document.querySelector('.header');
+        const footer = document.querySelector('footer');
+        const deleteBtn = document.querySelector('.icon_delete');
+        let data;
+        let formattedPrice;
+        let hadBooking;
+        let noBooking;
+        // let newOrderData;
 
-    // 標題回首頁
-    const header = document.querySelector('.header');
-    const footer = document.querySelector('footer');
-    const deleteBtn = document.querySelector('.icon_delete');
+        // 標題回首頁
+        header.addEventListener('click', function () {
+            window.location.href = '/';
+        });
 
-    deleteBtn.addEventListener('click', async function () {
-       try {
-        let token = localStorage.getItem("access_token");
-            const response = await fetch("/api/booking", {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const data = await response.json();
-
-            if(data.ok){
-                alert("預訂行程已刪除")
-                window.location.reload();
+        // 進入頁面
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                if (await verifyToken()) {
+                    await getOrderData();
+                } else {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('An error occurred:', error);
             }
-       } catch (error) {
-            console.error("失敗:", error);
-       }
-    });
+        });
 
-
-    header.addEventListener('click', function () {
-        window.location.href = '/';
-    });
-
-    document.addEventListener("DOMContentLoaded", async function () {
-        try {
-            if (await verifyToken()) {
-                await getOrderData();
-            } else {
-                window.location.href = '/';
-            }
-        } catch (error) {
-            console.error('An error occurred:', error);
-        }
-    });
-
-    // call api : /api/booking 'GET'
-    async function getOrderData() {
-        try {
-            let token = localStorage.getItem("access_token");
-            const response = await fetch("/api/booking", {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const response_data = await response.json();
-            const data = response_data.data;
-            const userName = userData.name;
-
-            if (response.status === 200 && data !== null) {
-                const arratctionDatas = data.attraction;
-                const hadBooking = document.getElementById('hadBooking');
-                const noBooking = document.getElementById('noBooking');
-                const memberName = document.getElementById('memberName');
-                const bookingPic = document.querySelector('.bookingPic');
-                const attractionName = document.getElementById('attractionName');
-                const ordersDate = document.getElementById('ordersDate');
-                const ordersTime = document.getElementById('ordersTime');
-                const ordersPrice = document.querySelectorAll('.ordersPrice');
-                const attractionAddress = document.getElementById('attractionAddress');
-                noBooking.style.display = "none"
-                hadBooking.style.display = "block";
-                // 有資料時 footer 不用那麼高
-                footer.classList.remove('footer-100vh');
-
-                const date = data.date;
-                const time = data.time;
-                const name = arratctionDatas.name;
-                const address = arratctionDatas.address;
-
-                // 替換 user name
-                memberName.textContent = userName;
-
-                attractionName.textContent = name;
-                attractionAddress.textContent = address;
-
-                // 替換圖片
-                const pic = arratctionDatas.image;
-                const newImage = document.createElement('img');
-                newImage.src = pic;
-                bookingPic.innerHTML = '';
-                bookingPic.appendChild(newImage)
-
-                // 替換日期
-                const newDate = new Date(date);
-                // 取得年、月、日
-                const year = newDate.getFullYear();
-                const month = String(newDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始的，所以要加 1
-                const day = String(newDate.getDate()).padStart(2, '0');
-
-                // 重新設定日期顯示內容
-                ordersDate.textContent = `${year}-${month}-${day}`;
-
-                // 替換價格
-                const priceNumber = data.price;
-                const price = `新台幣 ${priceNumber} 元`;
-                // 使用 toLocaleString 去除逗號＆確保小數為 0
-                const formattedPrice = priceNumber.toLocaleString('en-US', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2, // 將 maximumFractionDigits 設為 2
-                }).replace('.00', ''); // 移除小數部分
-                ordersPrice.forEach((element) => {
-                    element.innerHTML = `新台幣 ${formattedPrice} 元`;
+        // call api : /api/booking 'GET'
+        async function getOrderData() {
+            try {
+                let token = localStorage.getItem("access_token");
+                const response = await fetch("/api/booking", {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
-                // 替換 time
-                if (time === "morning") {
-                    ordersTime.textContent = "早上 9 點到下午 4 點";
-                } else if (time === "afternoon") {
-                    ordersTime.textContent = "下午 2 點到晚上 9 點";
-                };
-            } else if (response.status === 200 && data == null) {
-                hadBooking.style.display = "none";
-                noBooking.style.display = "block";
-                const memberName = document.getElementById('memberName');
-                // 替換 user name
-                memberName.textContent = userName;
-                // 沒資料時 footer vh 要變成 100%
-                footer.classList.add('footer-100vh');
-            }
-        } catch (error) {
-            console.error("失敗:", error);
-        }
-    }
+                const response_data = await response.json();
+                data = response_data.data;
+                const userName = userData.name;
+                // console.log(userData);
 
-</script>
+                if (response.status === 200 && data !== null) {
+                    const arratctionDatas = data.attraction;
+                    hadBooking = document.getElementById('hadBooking');
+                    noBooking = document.getElementById('noBooking');
+                    const memberName = document.getElementById('memberName');
+                    const bookingPic = document.querySelector('.bookingPic');
+                    const attractionName = document.getElementById('attractionName');
+                    const ordersDate = document.getElementById('ordersDate');
+                    const ordersTime = document.getElementById('ordersTime');
+                    const ordersPrice = document.querySelectorAll('.ordersPrice');
+                    const attractionAddress = document.getElementById('attractionAddress');
+                    noBooking.style.display = "none"
+                    hadBooking.style.display = "block";
+                    // 有資料時 footer 不用那麼高
+                    footer.classList.remove('footer-100vh');
+
+                    const date = data.date;
+                    const time = data.time;
+                    const name = arratctionDatas.name;
+                    const address = arratctionDatas.address;
+
+                    // 替換 user name
+                    memberName.textContent = userName;
+
+                    attractionName.textContent = name;
+                    attractionAddress.textContent = address;
+
+                    // 替換圖片
+                    const pic = arratctionDatas.image;
+                    const newImage = document.createElement('img');
+                    newImage.src = pic;
+                    bookingPic.innerHTML = '';
+                    bookingPic.appendChild(newImage)
+
+                    // // 替換日期
+                    // const newDate = new Date(date);
+                    // // 取得年、月、日
+                    // const year = newDate.getFullYear();
+                    // const month = String(newDate.getMonth() + 1).padStart(2, '0'); // 月份是從 0 開始的，所以要加 1
+                    // const day = String(newDate.getDate()).padStart(2, '0');
+
+                    // 重新設定日期顯示內容
+                    // ordersDate.textContent = `${year}-${month}-${day}`;
+                    ordersDate.textContent = date;
+
+                    // 替換價格
+                    const priceNumber = data.price;
+                    const price = `新台幣 ${priceNumber} 元`;
+                    // 使用 toLocaleString 去除逗號＆確保小數為 0
+                    formattedPrice = priceNumber.toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2, // 將 maximumFractionDigits 設為 2
+                    }).replace('.00', ''); // 移除小數部分
+                    ordersPrice.forEach((element) => {
+                        element.innerHTML = `新台幣 ${formattedPrice} 元`;
+                    });
+
+                    // 替換 time
+                    if (time === "morning") {
+                        ordersTime.textContent = "早上 9 點到下午 4 點";
+                    } else if (time === "afternoon") {
+                        ordersTime.textContent = "下午 2 點到晚上 9 點";
+                    };
+
+                    return data;
+
+                } else if (response.status === 200 && data == null) {
+                    hadBooking.style.display = "none";
+                    noBooking.style.display = "block";
+                    const memberName = document.getElementById('memberName');
+                    // 替換 user name
+                    memberName.textContent = userName;
+                    // 沒資料時 footer vh 要變成 100%
+                    footer.classList.add('footer-100vh');
+                }
+            } catch (error) {
+                console.error("失敗:", error);
+            }
+        }
+
+        // 刪除預訂
+        deleteBtn.addEventListener('click', async function () {
+            try {
+                let token = localStorage.getItem("access_token");
+                const response = await fetch("/api/booking", {
+                    method: "DELETE",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const data = await response.json();
+
+                if (data.ok) {
+                    alert("預訂行程已刪除")
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error("失敗:", error);
+            }
+        }); 
+    </script>
+    <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.17.0"></script>
+    <script>
+        TPDirect.setupSDK(137152, 'app_Y3tfk6ih5JYGnvGfAolAWSBrGVShxAHxPhkVg4TCXgVkUCAuZpxIoTjWimVi', 'sandbox')
+        TPDirect.card.setup({
+            fields: {
+                number: {
+                    element: '#card-number',
+                },
+                expirationDate: {
+                    element: '#tappay-expiration-date',
+                },
+                ccv: {
+                    element: '#card-ccv'
+                }
+            },
+            styles: {
+                'input': {
+                    'color': 'gray'
+                },
+                'input.ccv': {
+                    // 'font-size': '16px'
+                },
+                ':focus': {
+                    'color': 'black'
+                },
+                '.valid': {
+                    'color': 'green'
+                },
+                '.invalid': {
+                    'color': 'red'
+                },
+                '@media screen and (max-width: 400px)': {
+                    'input': {
+                        'color': 'orange'
+                    }
+                }
+            },
+            isMaskCreditCardNumber: true,
+            maskCreditCardNumberRange: {
+                beginIndex: 6,
+                endIndex: 11
+            }
+        });
+
+        TPDirect.card.onUpdate(function (update) {
+            if (update.canGetPrime) {
+                confirmBookingBtn.style.backgroundColor = '#448899';
+                confirmBookingBtn.style.cursor = 'pointer';
+                confirmBookingBtn.removeAttribute('disabled');
+            } else {
+                confirmBookingBtn.setAttribute('disabled', true);
+            }
+
+            const cardTypes = ['mastercard', 'visa', 'jcb', 'amex', 'unionpay'];
+            const newType = update.cardType === 'unknown' ? '' : update.cardType;
+            document.getElementById('cardtype').textContent = newType;
+            console.log(newType);
+
+            function setFormGroupStyle(selector, hasError, hasSuccess) {
+                const element = document.querySelector(selector);
+                element.classList.toggle('has-error', hasError);
+                element.classList.toggle('has-success', hasSuccess);
+            }
+
+            setFormGroupStyle('.card-number-group', update.status.number === 2, update.status.number === 0);
+            setFormGroupStyle('.expiration-date-group', update.status.expiry === 2, update.status.expiry === 0);
+            setFormGroupStyle('.ccv-group', update.status.ccv === 2, update.status.ccv === 0);
+        });
+
+        confirmBookingBtn.addEventListener('click', function (event) {
+            try {
+                verifyToken();
+                // event.preventDefault();
+                let token = localStorage.getItem("access_token");
+                forceBlurIos();
+                const tappayStatus = TPDirect.card.getTappayFieldsStatus();
+                if (!tappayStatus.canGetPrime) {
+                // alert('can not get prime');
+                return;
+                }
+                TPDirect.card.getPrime(function (result) {
+                    if (result.status !== 0) {
+                        // alert('get prime error ' + result.msg);
+                        return;
+                    }
+
+                    const dateElement = document.getElementById('ordersDate');
+                    const attractionData = data.attraction;
+                    const date = dateElement.textContent;
+                    const time = data.time;
+                    const price = formattedPrice;
+                    const contactName = document.getElementById('contactName').value;
+                    const contactEmail = document.getElementById('contactEmail').value;
+                    const contactPhone = document.getElementById('contactPhone').value;
+                    
+                    const status = result.status;
+                    const prime = result.card.prime;
+                    // console.log(status)
+                    // console.log(prime)
+
+                    const trip = {
+                        attraction: attractionData,
+                    };
+
+                    const contact = {
+                        name: contactName,
+                        email: contactEmail,
+                        phone: contactPhone,
+                    };
+
+                    const order = {
+                        price: price,
+                        trip: trip,
+                        date: date,
+                        time: time,
+                        contact: contact,
+                    };
+                    // console.log(order);
+
+                    const newOrderData = {
+                        prime : prime,
+                        order : order,
+                    };
+                    // console.log(newOrderData);
+                    
+                    // alert('get prime 成功，prime: ' + prime);
+                    createNewOrder(newOrderData);
+                    hadBooking.style.display = "none";
+                    noBooking.style.display = "block";
+                    // 沒資料時 footer vh 要變成 100%
+                    footer.classList.add('footer-100vh');
+
+                });
+
+            } catch (error) {
+                console.error("訂購失敗:", error);
+            }
+
+            
+        });
+
+        async function createNewOrder(newOrderData) {
+            try {
+                let token = localStorage.getItem("access_token");
+                const response = await fetch("/api/orders", {
+                    method: "POST",
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(newOrderData),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // console.log(data);
+                    const orderNumber = data.data.number;
+                    // console.log(orderNumber);
+                    window.location.href = '/thankyou?number=' + orderNumber;
+                } else {
+                    alert('訂購失敗，請重新訂購');
+                };
+
+            } catch (error) {
+                console.error("訂購失敗:", error);
+            }
+        }
+
+        function setNumberFormGroupToError(selector) {
+            const element = document.querySelector(selector);
+            element.classList.add('has-error');
+            element.classList.remove('has-success');
+        }
+
+        function setNumberFormGroupToSuccess(selector) {
+            const element = document.querySelector(selector);
+            element.classList.remove('has-error');
+            element.classList.add('has-success');
+        }
+
+        function setNumberFormGroupToNormal(selector) {
+            const element = document.querySelector(selector);
+            element.classList.remove('has-error');
+            element.classList.remove('has-success');
+        }
+
+
+        function forceBlurIos() {
+            if (!isIos()) {
+                return;
+            }
+            const input = document.createElement('input');
+            input.setAttribute('type', 'text');
+            document.activeElement.prepend(input);
+            input.focus();
+            input.parentNode.removeChild(input);
+        }
+
+        function isIos() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+    </script>
+</body>
+
 
 </html>
