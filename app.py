@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, json
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 import mysql.connector
+from mysql.connector import pooling
 import requests, random, string
 app = Flask(__name__, static_folder="public", static_url_path="/")
 app.config["JSON_AS_ASCII"]=False
@@ -19,6 +20,17 @@ mydb = mysql.connector.connect(
     database="websiteTT"
 )
 mycursor = mydb.cursor()
+
+
+# 創建一個 Connection Pool
+dbconfig = {
+    "host": "localhost",
+    "user": "wennie",
+    "password": "password",
+    "database": "websiteTT"
+}
+
+connection_pool = pooling.MySQLConnectionPool(pool_name="my_pool", pool_size=5, **dbconfig)
 
 # Pages
 @app.route("/")
@@ -686,5 +698,21 @@ def verify_payment(newOrderData):
 			"msg" :  api_response.get('msg')
 		}
 		return data
+	
+# 定義一個函數，用於從 Pool 中取得連線
+def get_db_connection():
+    connection = connection_pool.get_connection()
+    return connection
+
+# 在每個 HTTP 請求之前取得連線
+@app.before_request
+def before_request():
+    request.db_connection = get_db_connection()
+
+# 在每個 HTTP 請求之後釋放連線
+@app.teardown_request
+def teardown_request(exception):
+    if hasattr(request, 'db_connection'):
+        request.db_connection.close()
 
 app.run(host="0.0.0.0", debug=True, port=3000)
